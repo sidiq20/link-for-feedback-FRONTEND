@@ -70,7 +70,7 @@ const Login = () => {
 
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-300">
-                Email address
+                Email or Username
               </label>
               <div className="mt-1 relative">
                 <input
