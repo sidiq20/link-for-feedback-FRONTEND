@@ -1,0 +1,98 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-main: #0F0F0F;
+  --bg-card: #1A1A1A;
+  --text-primary: #FFFFFF;
+  --text-secondary: #B0B0B0;
+  --border-color: #2E2E2E;
+  --accent-pink: #FF5C8A;
+  --accent-yellow: #FFD93D;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+}
+
+@keyframes float-delayed {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-15px); }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-float-delayed {
+  animation: float-delayed 6s ease-in-out infinite 2s;
+}
+
+/* Responsive utilities */
+@layer utilities {
+  .line-clamp-3 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+  }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-card);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}
+
+/* Custom background patterns */
+.bg-whisper-main {
+  background-color: var(--bg-main);
+}
+
+.bg-whisper-card {
+  background-color: var(--bg-card);
+}
+
+.text-whisper-primary {
+  color: var(--text-primary);
+}
+
+.text-whisper-secondary {
+  color: var(--text-secondary);
+}
+
+.border-whisper {
+  border-color: var(--border-color);
+}
+
+.accent-pink {
+  color: var(--accent-pink);
+}
+
+.accent-yellow {
+  color: var(--accent-yellow);
+}
+
+.bg-accent-pink {
+  background-color: var(--accent-pink);
+}
+
+.bg-accent-yellow {
+  background-color: var(--accent-yellow);
+}
