@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
+import { Eye, EyeOff, User, Lock } from 'lucide-react';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -84,7 +84,7 @@ const Login = () => {
                   value={formData.email}
                   onChange={handleChange}
                 />
-                <Mail className="absolute left-3 top-3.5 h-4 w-4 text-gray-400" />
+                <User className="absolute left-3 top-3.5 h-4 w-4 text-gray-400" />
               </div>
             </div>
 
