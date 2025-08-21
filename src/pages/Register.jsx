@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { Eye, EyeOff, Mail, Lock, CheckCircle } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, CheckCircle, User } from 'lucide-react';
 
 const Register = () => {
   const [formData, setFormData] = useState({
     email: '',
+    name: '',
     password: '',
     confirmPassword: '',
   });
@@ -29,7 +30,7 @@ const Register = () => {
       return;
     }
 
-    const result = await register(formData.email, formData.password);
+    const result = await register(formData.name, formData.email, formData.password);
 
     if (result.success) {
       setSuccess(true);
@@ -97,6 +98,25 @@ const Register = () => {
                 <p className="text-red-400 text-sm">{error}</p>
               </div>
             )}
+
+            <div>
+            <label htmlFor="name" className="block text-sm font-medium text-gray-300">
+              Full Name
+            </label>
+            <div className="mt-1 relative">
+              <input
+                id="name"
+                name="name"
+                type="text"
+                required
+                className="appearance-none relative block w-full px-3 py-3 pl-10 border border-slate-700 placeholder-gray-400 text-white rounded-lg bg-slate-800/50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                placeholder="Enter your name"
+                value={formData.name}
+                onChange={handleChange}
+              />
+              <User className="absolute left-3 top-3.5 h-4 w-4 text-gray-400" />
+            </div>
+          </div>
 
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-300">

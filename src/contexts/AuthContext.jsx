@@ -58,10 +58,13 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const register = async (email, password) => {
+  const register = async (name, email, password) => {
     try {
-      const response = await AuthAPI.register({ email, password });
-      return { success: true, message: response.data?.message || 'Registration successful' };
+      const response = await AuthAPI.register({ name, email, password });
+      return {
+         success: true,
+          message: response.data?.message || 'Registration successful' 
+      };
     } catch (error) {
       return {
         success: false,

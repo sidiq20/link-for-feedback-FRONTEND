@@ -96,7 +96,7 @@ const Layout = ({ children }) => {
                 <User className="w-4 h-4 text-white" />
               </div>
               <span className="ml-3 text-sm font-medium text-white truncate max-w-[120px]">
-                {user?.email}
+                {user?.name}
               </span>
             </div>
             <button
