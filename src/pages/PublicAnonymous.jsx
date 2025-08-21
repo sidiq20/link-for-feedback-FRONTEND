@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { AnonymousLinksAPI, AnonymousAPI } from '../services/api';
-import { Send, Shield, MessageCircle, Calendar } from 'lucide-react';
+import { Send, Shield, MessageCircle } from 'lucide-react';
 
 const PublicAnonymous = () => {
   const { slug } = useParams();
+  const navigate = useNavigate();
+
   const [link, setLink] = useState(null);
-  const [publicMessages, setPublicMessages] = useState([]);
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [showParticipationPrompt, setShowParticipationPrompt] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -20,7 +22,6 @@ const PublicAnonymous = () => {
   const fetchLinkData = async () => {
     try {
       const linkRes = await AnonymousLinksAPI.bySlug(slug);
-
       setLink(linkRes.data);
     } catch (error) {
       console.error('Error fetching link data:', error);
@@ -97,22 +98,40 @@ const PublicAnonymous = () => {
           {/* Message Form */}
           <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-xl p-8 w-full">
             {submitted ? (
-              <div className="text-center">
-                <div className="w-16 h-16 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Send className="w-8 h-8 text-purple-400" />
-                </div>
-                <h2 className="text-2xl font-bold text-white mb-2">Message Sent!</h2>
-                <p className="text-gray-400">Your anonymous message has been delivered successfully.</p>
-                <button
-                  onClick={() => {
-                    setSubmitted(false);
-                    setMessage('');
-                  }}
-                  className="mt-4 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors"
-                >
-                  Send Another Message
-                </button>
-              </div>
+              <>
+                {!showParticipationPrompt ? (
+                  <div className="text-center">
+                    <div className="w-16 h-16 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <Send className="w-8 h-8 text-purple-400" />
+                    </div>
+                    <h2 className="text-2xl font-bold text-white mb-2">Message Sent!</h2>
+                    <p className="text-gray-400">Your anonymous message has been delivered successfully.</p>
+                    <button
+                      onClick={() => setShowParticipationPrompt(true)}
+                      className="mt-4 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors"
+                    >
+                      Continue
+                    </button>
+                  </div>
+                ) : (
+                  <div className="text-center">
+                    <div className="w-20 h-20 bg-purple-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <Shield className="w-10 h-10 text-purple-400" />
+                    </div>
+                    <h2 className="text-2xl font-bold text-white mb-2">Now It’s Your Turn!</h2>
+                    <p className="text-gray-400 mb-4">
+                      You’ve shared your thoughts anonymously — now take the next step 
+                      and participate. It’s your secrets that matter too!
+                    </p>
+                    <button
+                      onClick={() => navigate('/register')}
+                      className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors"
+                    >
+                      Register & Share Yours
+                    </button>
+                  </div>
+                )}
+              </>
             ) : (
               <>
                 <h2 className="text-2xl font-bold text-white mb-6 flex items-center">
