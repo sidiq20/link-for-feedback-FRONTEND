@@ -101,7 +101,7 @@ const Register = () => {
 
             <div>
             <label htmlFor="name" className="block text-sm font-medium text-gray-300">
-              Full Name
+              Username
             </label>
             <div className="mt-1 relative">
               <input
