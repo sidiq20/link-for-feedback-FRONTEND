@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL; // || 'https://link-for-feedback-backend.onrender.com';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://link-for-feedback-backend.onrender.com';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -105,4 +105,30 @@ export const AnonymousAPI = {
   detail: (id) => api.get(`/api/anonymous/message/${id}`),
   delete: (id) => api.delete(`/api/anonymous/${id}`),
 };
+
+export const FormsAPI = {
+  create: (data) => api.post('/api/forms/', data),
+  list: () => api.get('/api/forms/'),
+  get: (id) => api.get(`/api/forms/${id}`),
+  update: (id, data) => api.put(`/api/forms/${id}`, data),
+  delete: (id) => api.delete(`/api/forms/${id}`),
+  results: (id) => api.get(`/api/forms/${id}/results`),
+  vote: (id, data) => api.post(`/api/forms/${id}/vote`, data),
+};
+
+export const FormLinksAPI = {
+  create: (formId, data) => api.post(`/api/form-links/${formId}`, data),
+  bySlug: (slug) => api.get(`/api/form-links/slug/${slug}`),
+};
+
+export const FormResponseAPI = {
+  list: (formId) => api.get(`/api/form-response/form/${formId}`),
+  results: (formId) => api.get(`/api/form-response/results/${formId}`),
+  submit: (slug, data) => {
+    console.log('FormResponseAPI.submit called with:', { slug, data });
+    return api.post(`/api/form-response/submit/${slug}`, data);
+  },
+};
+
+
 export default api;

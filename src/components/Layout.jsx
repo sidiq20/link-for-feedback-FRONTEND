@@ -12,7 +12,11 @@ import {
   LogOut, 
   Menu, 
   X,
-  MessageSquare as MessageSquareIcon
+  MessageSquare as MessageSquareIcon,
+  FilePlus,
+  FileText,
+  Edit,
+  ListChecks
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -34,6 +38,8 @@ const Layout = ({ children }) => {
     { name: 'Anonymous Links', href: '/anonymous-links', icon: Shield },
     { name: 'Anonymous Messages', href: '/anonymous-messages', icon: MessageCircle },
     { name: 'Analytics', href: '/analytics', icon: BarChart3 },
+
+    { name: 'Forms', href: '/forms', icon: FileText },
   ];
 
   return (

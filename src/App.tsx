@@ -19,6 +19,16 @@ import AnonymousMessages from './pages/AnonymousMessages';
 import PublicFeedback from './pages/PublicFeedback';
 import PublicAnonymous from './pages/PublicAnonymous';
 
+// Forms
+import Forms from './pages/Forms';
+import CreateForm from './pages/CreateForm';
+import FormDetail from './pages/FormDetail';
+import FormResults from './pages/FormResults';
+import ViewForm from './pages/ViewForm';
+import PublicForm from './pages/PublicForm';
+import EditForm from './pages/EditForm';
+
+
 function App() {
   return (
     <AuthProvider>
@@ -123,6 +133,55 @@ function App() {
           
           {/* Default redirect */}
           <Route path="/app" element={<Navigate to="/dashboard" replace />} />
+
+          <Route
+            path="/forms"
+            element={
+              <ProtectedRoute>
+                <Layout><Forms /></Layout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route 
+            path="/forms/new"
+            element={
+              <ProtectedRoute>
+                <CreateForm />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route 
+            path="/forms/:id/results"
+            element={
+              <ProtectedRoute>
+                <Layout><FormResults /></Layout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route 
+            path="/forms/:formId/view"
+            element={
+              <ProtectedRoute>
+                <ViewForm />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route path="/p/:slug" element={<PublicForm />} />
+
+          <Route path="/forms/:formId" element={<FormDetail />} />
+          
+          <Route 
+            path="/forms/:formId/edit"
+            element={
+              <ProtectedRoute>
+                <Layout><EditForm /></Layout>
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </Router>
     </AuthProvider>
