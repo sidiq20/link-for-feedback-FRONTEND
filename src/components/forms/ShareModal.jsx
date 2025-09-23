@@ -18,19 +18,65 @@ const ShareModal = ({ form, isOpen, onClose }) => {
 
   useEffect(() => {
     if (isOpen && form) {
-      generateShareLink();
+      // If form already has a slug, use it directly
+      if (form.slug) {
+        const fullUrl = `${window.location.origin}/p/${form.slug}`;
+        setShareLink(fullUrl);
+      } else {
+        generateShareLink();
+      }
     }
   }, [isOpen, form]);
 
   const generateShareLink = async () => {
     setLoading(true);
     try {
-      const response = await FormLinksAPI.create(form._id, { expires_in_days: expiresIn });
+      console.log('=== ShareModal Debug ===');
+      console.log('Full form object:', JSON.stringify(form, null, 2));
+      console.log('form keys:', Object.keys(form));
+      console.log('form._id:', form._id);
+      console.log('form.id:', form.id);
+      console.log('form.form_id:', form.form_id);
+      
+      // Use the correct form ID field with priority order
+      let formId = form._id || form.id || form.form_id;
+      console.log('Initial form ID:', formId, 'Type:', typeof formId);
+      
+      if (!formId) {
+        console.error('❌ No valid form ID found in form object');
+        throw new Error('No valid form ID found');
+      }
+      
+      // Make sure formId is a string and not an object
+      if (typeof formId === 'object') {
+        console.error('❌ Form ID is an object:', formId);
+        console.error('This will cause URL construction issues');
+        // If it's the entire response object, try to extract the ID
+        if (formId.form_id) {
+          formId = formId.form_id;
+          console.log('✅ Extracted form_id from object:', formId);
+        } else {
+          throw new Error('Form ID is an object but has no form_id property');
+        }
+      }
+      
+      const cleanFormId = String(formId);
+      console.log('Final clean form ID:', cleanFormId);
+      console.log('About to call FormLinksAPI.create with:', cleanFormId);
+      
+      const response = await FormLinksAPI.create(cleanFormId, { expires_in_days: expiresIn });
+      console.log('✅ Form link response:', response.data);
       const slug = response.data.slug;
       const fullUrl = `${window.location.origin}/p/${slug}`;
       setShareLink(fullUrl);
     } catch (error) {
-      console.error('Failed to generate share link:', error);
+      console.error('❌ Failed to generate share link:', error);
+      console.error('Error details:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+        config: error.config
+      });
     } finally {
       setLoading(false);
     }

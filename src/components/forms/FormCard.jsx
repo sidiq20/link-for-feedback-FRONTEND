@@ -11,20 +11,18 @@ import {
   Eye,
   Users
 } from 'lucide-react';
+import { formatDate } from '../../utils/dateUtils';
 
 const FormCard = ({ form, onDelete, onShare }) => {
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
-  };
 
   return (
-    <div className="bg-whisper-card border border-whisper-border rounded-xl p-6 hover:bg-opacity-80 transition-all duration-200 group">
+    <div className="bg-whisper-card border border-whisper-border rounded-xl overflow-hidden hover:bg-opacity-80 transition-all duration-200 group">
       <div className="flex justify-between items-start">
-        <div className="flex-1">
+        {/* Clickable main area - goes to results */}
+        <Link 
+          to={`/forms/${form._id}/results`}
+          className="flex-1 p-6 hover:bg-slate-800/20 transition-colors"
+        >
           <div className="flex items-center space-x-3 mb-3">
             <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
               <FileText className="w-5 h-5 text-white" />
@@ -53,19 +51,24 @@ const FormCard = ({ form, onDelete, onShare }) => {
               {form.response_count || 0} responses
             </div>
           </div>
-        </div>
+        </Link>
 
-        <div className="flex items-center space-x-2 ml-4">
+        {/* Action buttons */}
+        <div className="flex items-center space-x-1 p-3">
           <Link
             to={`/forms/${form._id}/view`}
             className="p-2 text-gray-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
-            title="View form"
+            title="Preview form"
+            onClick={(e) => e.stopPropagation()}
           >
             <Eye className="w-4 h-4" />
           </Link>
 
           <button
-            onClick={() => onShare(form)}
+            onClick={(e) => {
+              e.stopPropagation();
+              onShare(form);
+            }}
             className="p-2 text-gray-400 hover:text-blue-400 hover:bg-blue-900/20 rounded-lg transition-colors"
             title="Share form"
           >
@@ -76,20 +79,16 @@ const FormCard = ({ form, onDelete, onShare }) => {
             to={`/forms/${form._id}/edit`}
             className="p-2 text-gray-400 hover:text-yellow-400 hover:bg-yellow-900/20 rounded-lg transition-colors"
             title="Edit form"
+            onClick={(e) => e.stopPropagation()}
           >
             <Edit className="w-4 h-4" />
           </Link>
 
-          <Link
-            to={`/forms/${form._id}/results`}
-            className="p-2 text-gray-400 hover:text-green-400 hover:bg-green-900/20 rounded-lg transition-colors"
-            title="View results"
-          >
-            <BarChart3 className="w-4 h-4" />
-          </Link>
-
           <button
-            onClick={() => onDelete(form._id)}
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete(form._id);
+            }}
             className="p-2 text-gray-400 hover:text-red-400 hover:bg-red-900/20 rounded-lg transition-colors"
             title="Delete form"
           >

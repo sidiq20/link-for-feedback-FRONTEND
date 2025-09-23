@@ -24,6 +24,7 @@ import Forms from './pages/Forms';
 import CreateForm from './pages/CreateForm';
 import FormDetail from './pages/FormDetail';
 import FormResults from './pages/FormResults';
+import FormAnalytics from './pages/FormAnalytics';
 import ViewForm from './pages/ViewForm';
 import PublicForm from './pages/PublicForm';
 import EditForm from './pages/EditForm';
@@ -153,10 +154,19 @@ function App() {
           />
 
           <Route 
-            path="/forms/:id/results"
+            path="/forms/:formId/results"
             element={
               <ProtectedRoute>
                 <Layout><FormResults /></Layout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route 
+            path="/forms/:formId/analytics"
+            element={
+              <ProtectedRoute>
+                <Layout><FormAnalytics /></Layout>
               </ProtectedRoute>
             }
           />

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FormsAPI } from '../services/api';
+import { formatDate } from '../utils/dateUtils';
 import ShareModal from '../components/forms/ShareModal';
 import QuestionRenderer from '../components/forms/QuestionRenderer';
 import { 
@@ -105,7 +106,7 @@ const ViewForm = () => {
                     <div className="flex items-center space-x-4 text-sm text-gray-400 mt-1">
                       <div className="flex items-center">
                         <Calendar className="w-4 h-4 mr-1" />
-                        Created {new Date(form.created_at).toLocaleDateString()}
+                        Created {formatDate(form.created_at)}
                       </div>
                       <div className="flex items-center">
                         <Users className="w-4 h-4 mr-1" />
@@ -164,6 +165,7 @@ const ViewForm = () => {
                     <div className="flex-1">
                       <QuestionRenderer
                         question={question}
+                        questionIndex={(index + 1).toString()}
                         answer=""
                         onChange={() => {}}
                         disabled={true}

@@ -18,7 +18,7 @@ const CreateForm = () => {
       ...prev,
       questions: [
         ...prev.questions,
-        { text: '', type: 'text', required: false } // 🚫 no options by default
+        { question: '', type: 'text', required: false }
       ]
     }));
   };
@@ -84,7 +84,7 @@ const CreateForm = () => {
     // Validate questions
     for (let i = 0; i < formData.questions.length; i++) {
       const q = formData.questions[i];
-      if (!q.text.trim()) {
+      if (!q.question.trim()) {
         setError(`Question ${i + 1} text is required`);
         return;
       }
@@ -194,8 +194,8 @@ const CreateForm = () => {
                         type="text"
                         placeholder="Enter question text"
                         className="w-full px-3 py-2 border border-slate-600 rounded-lg bg-slate-900/50 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
-                        value={q.text}
-                        onChange={(e) => updateQuestion(i, 'text', e.target.value)}
+                        value={q.question}
+                        onChange={(e) => updateQuestion(i, 'question', e.target.value)}
                         required
                       />
                       

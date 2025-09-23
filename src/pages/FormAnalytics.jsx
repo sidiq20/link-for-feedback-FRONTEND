@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FormResponseAPI, FormsAPI } from '../services/api';
-import { formatDateTime } from '../utils/dateUtils';
-import { ArrowLeft, Loader2, BarChart2, User, FileText, Calendar, TrendingUp } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { formatChartDate } from '../utils/dateUtils';
+import { ArrowLeft, Loader2, TrendingUp, Users, FileText, Calendar, BarChart3 } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
 
-const FormResults = () => {
+const FormAnalytics = () => {
   const { formId } = useParams();
   const [form, setForm] = useState(null);
   const [results, setResults] = useState([]);
@@ -15,10 +15,10 @@ const FormResults = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchResults();
-  }, [formId]); // eslint-disable-line react-hooks/exhaustive-deps
+    fetchAnalytics();
+  }, [formId]);
 
-  const fetchResults = async () => {
+  const fetchAnalytics = async () => {
     setLoading(true);
     setError('');
     
@@ -28,53 +28,30 @@ const FormResults = () => {
         return;
       }
       
-      console.log('🔍 FormResults: Starting fetch for formId:', formId);
+      console.log('📊 FormAnalytics: Starting fetch for formId:', formId);
       
-      // Step 1: Fetch form details
-      console.log('📄 Step 1: Fetching form details...');
-      const formRes = await FormsAPI.get(formId);
-      console.log('✅ Form loaded:', formRes.data?.title);
+      // Fetch form details and responses
+      const [formRes, resultsRes] = await Promise.all([
+        FormsAPI.get(formId),
+        FormResponseAPI.list(formId)
+      ]);
+      
       setForm(formRes.data);
-      
-      // Step 2: Fetch individual responses
-      console.log('📄 Step 2: Fetching individual responses...');
-      const resultsRes = await FormResponseAPI.list(formId);
-      console.log('✅ Responses loaded:', resultsRes.data?.length || 0, 'responses');
       setResults(resultsRes.data || []);
       
-      // Step 3: Fetch poll results (optional)
-      console.log('📄 Step 3: Fetching poll results...');
+      // Fetch poll results
       try {
         const pollRes = await FormResponseAPI.results(formId);
-        console.log('✅ Poll results loaded:', Object.keys(pollRes.data || {}));
         setPollResults(pollRes.data || {});
       } catch (pollError) {
-        console.warn('⚠️ Poll results failed (continuing):', pollError.message);
+        console.warn('⚠️ Poll results failed:', pollError.message);
         setPollResults({});
       }
       
-      console.log('🎉 FormResults: All data loaded successfully!');
+      console.log('✅ FormAnalytics: Data loaded successfully!');
     } catch (error) {
-      console.error('❌ FormResults: Critical error occurred:', error);
-      
-      // Log detailed error information
-      if (error.response) {
-        console.error('Response Error:', {
-          status: error.response.status,
-          statusText: error.response.statusText,
-          data: error.response.data,
-          url: error.config?.url
-        });
-      } else if (error.request) {
-        console.error('Network Error:', {
-          message: 'No response received',
-          url: error.config?.url
-        });
-      } else {
-        console.error('Request Setup Error:', error.message);
-      }
-      
-      setError(`Failed to load results: ${error.message}`);
+      console.error('❌ FormAnalytics: Error occurred:', error);
+      setError(`Failed to load analytics: ${error.message}`);
     } finally {
       setLoading(false);
     }
@@ -82,10 +59,40 @@ const FormResults = () => {
 
   const COLORS = ['#8B5CF6', '#EC4899', '#F59E0B', '#10B981', '#3B82F6', '#EF4444'];
 
+  // Generate analytics data
+  const getResponseTrend = () => {
+    if (!results.length) return [];
+    
+    const grouped = results.reduce((acc, response) => {
+      const date = formatChartDate(response.submitted_at);
+      if (date) {
+        acc[date] = (acc[date] || 0) + 1;
+      }
+      return acc;
+    }, {});
+    
+    return Object.entries(grouped).map(([date, count]) => ({
+      date,
+      responses: count
+    }));
+  };
+
+  const getCompletionRate = () => {
+    if (!results.length) return 0;
+    
+    const completedResponses = results.filter(response => {
+      const answers = response.answers || {};
+      return Object.keys(answers).length > 0;
+    });
+    
+    return Math.round((completedResponses.length / results.length) * 100);
+  };
+
   const renderPollChart = (question, data) => {
     const chartData = Object.entries(data).map(([option, count]) => ({
       option,
-      count
+      count,
+      percentage: Math.round((count / results.length) * 100)
     }));
 
     return (
@@ -118,7 +125,7 @@ const FormResults = () => {
                   cx="50%"
                   cy="50%"
                   labelLine={false}
-                  label={({ option, percent }) => `${option} ${(percent * 100).toFixed(0)}%`}
+                  label={({ option, percentage }) => `${option} ${percentage}%`}
                   outerRadius={80}
                   fill="#8884d8"
                   dataKey="count"
@@ -135,12 +142,13 @@ const FormResults = () => {
       </div>
     );
   };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-8 h-8 animate-spin text-purple-500 mx-auto mb-4" />
-          <p className="text-gray-400">Loading results...</p>
+          <p className="text-gray-400">Loading analytics...</p>
         </div>
       </div>
     );
@@ -151,13 +159,13 @@ const FormResults = () => {
       <div className="min-h-screen bg-slate-950 flex items-center justify-center">
         <div className="text-center">
           <FileText className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-white mb-2">Error Loading Results</h1>
+          <h1 className="text-2xl font-bold text-white mb-2">Error Loading Analytics</h1>
           <p className="text-gray-400 mb-6">{error}</p>
           <div className="flex items-center justify-center space-x-4">
             <button
               onClick={() => {
                 setError('');
-                fetchResults();
+                fetchAnalytics();
               }}
               className="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
             >
@@ -177,6 +185,9 @@ const FormResults = () => {
     );
   }
 
+  const responseTrend = getResponseTrend();
+  const completionRate = getCompletionRate();
+
   return (
     <div className="min-h-screen bg-slate-950 relative overflow-hidden">
       {/* Background */}
@@ -186,32 +197,32 @@ const FormResults = () => {
         <div className="absolute bottom-1/4 right-1/3 w-64 h-64 bg-purple-400/15 rounded-full blur-3xl"></div>
       </div>
 
-      <div className="relative z-10 max-w-6xl mx-auto p-6 lg:p-8">
+      <div className="relative z-10 max-w-7xl mx-auto p-6 lg:p-8">
         {/* Header */}
         <div className="mb-8">
           <button
-            onClick={() => navigate('/forms')}
+            onClick={() => navigate(`/forms/${formId}/results`)}
             className="inline-flex items-center text-gray-400 hover:text-white transition-colors mb-4"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Forms
+            Back to Results
           </button>
 
           <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-xl p-6">
             <div className="flex items-center space-x-3 mb-4">
               <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
-                <BarChart2 className="w-6 h-6 text-white" />
+                <TrendingUp className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-white">{form?.title} - Results</h1>
+                <h1 className="text-3xl font-bold text-white">{form?.title} - Analytics</h1>
                 <div className="flex items-center space-x-4 text-sm text-gray-400 mt-1">
                   <div className="flex items-center">
-                    <Calendar className="w-4 h-4 mr-1" />
+                    <Users className="w-4 h-4 mr-1" />
                     {results.length} total responses
                   </div>
                   <div className="flex items-center">
-                    <TrendingUp className="w-4 h-4 mr-1" />
-                    Analytics & Insights
+                    <BarChart3 className="w-4 h-4 mr-1" />
+                    {completionRate}% completion rate
                   </div>
                 </div>
               </div>
@@ -221,9 +232,9 @@ const FormResults = () => {
 
         {results.length === 0 ? (
           <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-xl p-12 text-center">
-            <BarChart2 className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-            <h3 className="text-xl font-medium text-white mb-2">No Responses Yet</h3>
-            <p className="text-gray-400 mb-6">Share your form to start collecting responses.</p>
+            <TrendingUp className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+            <h3 className="text-xl font-medium text-white mb-2">No Data Yet</h3>
+            <p className="text-gray-400 mb-6">Analytics will appear once you have form responses.</p>
             <button
               onClick={() => navigate(`/forms/${formId}/view`)}
               className="inline-flex items-center px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors"
@@ -233,60 +244,80 @@ const FormResults = () => {
           </div>
         ) : (
           <div className="space-y-8">
-            {/* Individual Responses */}
-            <div className="space-y-6">
-              <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-white">Individual Responses</h2>
-                <button
-                  onClick={() => navigate(`/forms/${formId}/analytics`)}
-                  className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-lg transition-all duration-200 transform hover:scale-105"
-                >
-                  <TrendingUp className="w-4 h-4 mr-2" />
-                  View Analytics
-                </button>
+            {/* Stats Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-xl p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-gray-400 text-sm">Total Responses</p>
+                    <p className="text-3xl font-bold text-white">{results.length}</p>
+                  </div>
+                  <Users className="w-8 h-8 text-purple-400" />
+                </div>
               </div>
-              <div className="grid gap-6">
-                {results.map((response, index) => (
-                  <div
-                    key={index}
-                    className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-xl p-6"
-                  >
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center space-x-2">
-                        <User className="w-5 h-5 text-purple-400" />
-                        <span className="font-semibold text-white">Response #{index + 1}</span>
-                      </div>
-                      <div className="text-sm text-gray-400">
-                        {formatDateTime(response.submitted_at)}
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-4">
-                      {response.answers && Object.keys(response.answers).length > 0 ? (
-                        Object.entries(response.answers).map(([question, answer], idx) => (
-                          <div key={idx} className="border-l-4 border-purple-500 pl-4">
-                            <p className="text-gray-400 text-sm font-medium">{question}</p>
-                            <p className="text-white mt-1">
-                              {Array.isArray(answer) ? answer.join(', ') : (answer || 'No answer')}
-                            </p>
-                          </div>
-                        ))
-                      ) : (
-                        <div className="text-gray-400 italic">
-                          No answers available for this response
-                        </div>
-                      )}
-                    </div>
+              
+              <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-xl p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-gray-400 text-sm">Completion Rate</p>
+                    <p className="text-3xl font-bold text-white">{completionRate}%</p>
+                  </div>
+                  <BarChart3 className="w-8 h-8 text-green-400" />
+                </div>
+              </div>
+              
+              <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-xl p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-gray-400 text-sm">Questions</p>
+                    <p className="text-3xl font-bold text-white">{form?.questions?.length || 0}</p>
+                  </div>
+                  <FileText className="w-8 h-8 text-blue-400" />
+                </div>
+              </div>
+            </div>
+
+            {/* Response Trend */}
+            {responseTrend.length > 1 && (
+              <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-xl p-6">
+                <h2 className="text-2xl font-bold text-white mb-6">Response Trend</h2>
+                <div className="h-80">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={responseTrend}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                      <XAxis dataKey="date" stroke="#9CA3AF" fontSize={12} />
+                      <YAxis stroke="#9CA3AF" fontSize={12} />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: '#1F2937',
+                          border: '1px solid #374151',
+                          borderRadius: '8px',
+                          color: '#F9FAFB'
+                        }}
+                      />
+                      <Line type="monotone" dataKey="responses" stroke="#8B5CF6" strokeWidth={2} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            )}
+
+            {/* Question Analytics */}
+            {Object.keys(pollResults).length > 0 && (
+              <div className="space-y-6">
+                <h2 className="text-2xl font-bold text-white">Question Analytics</h2>
+                {Object.entries(pollResults).map(([question, data]) => (
+                  <div key={question}>
+                    {renderPollChart(question, data)}
                   </div>
                 ))}
               </div>
-            </div>
+            )}
           </div>
         )}
-        </div>
-      )}
+      </div>
     </div>
   );
 };
 
-export default FormResults;
+export default FormAnalytics;

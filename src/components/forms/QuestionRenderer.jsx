@@ -1,8 +1,8 @@
 import React from 'react';
 
-const QuestionRenderer = ({ question, answer, onChange, disabled = false }) => {
+const QuestionRenderer = ({ question, questionIndex, answer, onChange, disabled = false }) => {
   const handleChange = (value) => {
-    onChange(question.text, value);
+    onChange(questionIndex, value);
   };
 
   const renderInput = () => {
@@ -50,7 +50,7 @@ const QuestionRenderer = ({ question, answer, onChange, disabled = false }) => {
               <label key={index} className="flex items-center space-x-3 cursor-pointer">
                 <input
                   type="radio"
-                  name={question.text}
+                  name={`question-${questionIndex}`}
                   value={option}
                   checked={answer === option}
                   onChange={(e) => handleChange(e.target.value)}
@@ -106,7 +106,7 @@ const QuestionRenderer = ({ question, answer, onChange, disabled = false }) => {
   return (
     <div className="space-y-3">
       <label className="block text-white font-medium">
-        {question.text}
+        {question.question || question.text}
         {question.required && <span className="text-red-400 ml-1">*</span>}
       </label>
       {renderInput()}

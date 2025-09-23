@@ -29,10 +29,10 @@ const PublicForm = () => {
     }
   };
 
-  const handleChange = (question, value) => {
+  const handleChange = (questionIndex, value) => {
     setAnswers({
       ...answers,
-      [question]: value,
+      [questionIndex]: value,
     });
   };
 
@@ -42,16 +42,10 @@ const PublicForm = () => {
     setError('');
     
     try {
-      // Transform answers to match backend expected format
-      const formattedAnswers = {};
-      Object.entries(answers).forEach(([question, answer], idx) => {
-        formattedAnswers[idx + 1] = answer
-      });
-
-      FormResponseAPI.submit(slug, { answers: formattedAnswers });
+      // The answers are already in the correct format: {"1": "answer", "2": "answer"}
+      console.log('Submitting form response:', { answers });
       
-      console.log('Submitting form response:', { answers: formattedAnswers });
-      await FormResponseAPI.submit(slug, { answers: formattedAnswers });
+      await FormResponseAPI.submit(slug, { answers });
       setSubmitted(true);
     } catch (error) {
       console.error('Failed to submit form:', error);
@@ -142,22 +136,26 @@ const PublicForm = () => {
               </div>
             )}
 
-            {form.questions?.map((question, index) => (
-              <div key={index} className="p-6 bg-slate-800/30 border border-slate-700 rounded-xl">
-                <div className="flex items-start space-x-4">
-                  <div className="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm flex-shrink-0 mt-1">
-                    {index + 1}
-                  </div>
-                  <div className="flex-1">
-                    <QuestionRenderer
-                      question={question}
-                      answer={answers[question.text] || ''}
-                      onChange={handleChange}
-                    />
+            {form.questions?.map((question, index) => {
+              const questionKey = (index + 1).toString();
+              return (
+                <div key={index} className="p-6 bg-slate-800/30 border border-slate-700 rounded-xl">
+                  <div className="flex items-start space-x-4">
+                    <div className="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm flex-shrink-0 mt-1">
+                      {index + 1}
+                    </div>
+                    <div className="flex-1">
+                      <QuestionRenderer
+                        question={question}
+                        questionIndex={questionKey}
+                        answer={answers[questionKey] || ''}
+                        onChange={handleChange}
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
 
             <button
               type="submit"

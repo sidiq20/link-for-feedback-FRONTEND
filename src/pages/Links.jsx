@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FeedbackLinksAPI } from '../services/api';
+import { formatDate } from '../utils/dateUtils';
 import { 
   Plus, 
   Search, 
@@ -157,10 +158,14 @@ const Links = () => {
           filteredLinks.map((link) => (
             <div
               key={link._id}
-              className="bg-whisper-card backdrop-blur-xl border border-whisper-border rounded-xl p-6 hover:bg-opacity-80 transition-colors"
+              className="bg-whisper-card backdrop-blur-xl border border-whisper-border rounded-xl overflow-hidden hover:bg-opacity-80 transition-colors"
             >
               <div className="flex items-start justify-between">
-                <div className="flex-1">
+                {/* Clickable main area - goes to feedback messages */}
+                <Link 
+                  to={`/feedback?link=${link._id}`}
+                  className="flex-1 p-6 hover:bg-slate-800/20 transition-colors"
+                >
                   <div className="flex items-center space-x-3 mb-2">
                     <h3 className="text-lg font-semibold text-white">{link.name}</h3>
                     <div className="flex items-center space-x-2">
@@ -193,18 +198,22 @@ const Links = () => {
                   <div className="flex items-center space-x-4 text-sm text-gray-400">
                     <div className="flex items-center">
                       <Calendar className="w-4 h-4 mr-1" />
-                      {new Date(link.created_at).toLocaleDateString()}
+                      {formatDate(link.created_at)}
                     </div>
                     <div className="flex items-center">
                       <ExternalLink className="w-4 h-4 mr-1" />
                       <span className="font-mono text-xs">/f/{link.slug}</span>
                     </div>
                   </div>
-                </div>
+                </Link>
 
-                <div className="flex items-center space-x-2 ml-4">
+                {/* Action buttons */}
+                <div className="flex items-center space-x-1 p-3">
                   <button
-                    onClick={() => toggleLinkStatus(link._id, link.is_active)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleLinkStatus(link._id, link.is_active);
+                    }}
                     className={`p-2 rounded-lg transition-colors ${
                       link.is_active
                         ? 'text-green-400 hover:bg-green-900/20'
@@ -216,13 +225,15 @@ const Links = () => {
                   </button>
 
                   <button
-                    onClick={() => openEditModal(link)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openEditModal(link);
+                    }}
                     className="p-2 text-gray-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
                     title="Edit link"
                   >
                     <Edit className="w-4 h-4" />
                   </button>
-
 
                   <a
                     href={`/f/${link.slug}`}
@@ -230,12 +241,16 @@ const Links = () => {
                     rel="noopener noreferrer"
                     className="p-2 text-gray-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
                     title="View public page"
+                    onClick={(e) => e.stopPropagation()}
                   >
                     <ExternalLink className="w-4 h-4" />
                   </a>
 
                   <button
-                    onClick={() => handleDelete(link.id)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(link._id);
+                    }}
                     className="p-2 text-red-400 hover:text-red-300 hover:bg-red-900/20 rounded-lg transition-colors"
                     title="Delete link"
                   >
