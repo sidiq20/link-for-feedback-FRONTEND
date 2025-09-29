@@ -140,8 +140,10 @@ const Layout = ({ children }) => {
         </div>
 
         {/* Page Content */}
-        <main className="relative z-10 min-h-screen">
-          {children}
+        <main className="relative z-10 min-h-screen px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto">
+            {children}
+          </div>
         </main>
       </div>
 
