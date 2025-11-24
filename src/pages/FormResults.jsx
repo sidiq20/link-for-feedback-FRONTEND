@@ -284,7 +284,6 @@ const FormResults = () => {
           </div>
         )}
         </div>
-      )}
     </div>
   );
 };

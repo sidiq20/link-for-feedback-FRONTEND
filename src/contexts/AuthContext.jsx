@@ -24,7 +24,7 @@ export const AuthProvider = ({ children }) => {
           setUser(response.data);
         } catch (error) {
           localStorage.removeItem('access_token');
-          localStorage.removeItem('refresh_token');
+          // Refresh token is in httpOnly cookie, no need to remove from localStorage
         }
       }
       setLoading(false);
@@ -35,16 +35,14 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      console.log('Attempting login to:', `${import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:5000'}/auth/login`);
+      console.log('Attempting login to:', `${import.meta.env.VITE_API_BASE_URL || 'http://172.20.10.7:5000'}/api/auth/login`);
       const response = await AuthAPI.login({ email, password });
       console.log('Login response:', response);
-      const { access_token, refresh_token, user } = response.data || {};
+      const { access_token, user } = response.data || {};
       
       if (access_token) {
         localStorage.setItem('access_token', access_token);
-        if (refresh_token) {
-          localStorage.setItem('refresh_token', refresh_token);
-        }
+        // Refresh token is set as httpOnly cookie by backend
         setUser(user);
       }
       
@@ -75,15 +73,13 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      const refreshToken = localStorage.getItem('refresh_token');
-      if (refreshToken) {
-        await AuthAPI.logout({ refresh_token: refreshToken });
-      }
+      // Backend reads refresh token from httpOnly cookie
+      await AuthAPI.logout();
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
       localStorage.removeItem('access_token');
-      localStorage.removeItem('refresh_token');
+      // Refresh token cookie is cleared by backend
       setUser(null);
     }
   };
@@ -112,6 +108,34 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const googleLogin = async () => {
+    try {
+      const res = await AuthAPI.googleURL();
+      window.location.href = res.data.url;
+    } catch (error) {
+      console.error('Google login error:', error);
+      throw error;
+    }
+  };
+
+  const handleOAuthCallback = async (accessToken, refreshToken) => {
+    try {
+      // Store tokens
+      localStorage.setItem('access_token', accessToken);
+      // Note: refresh token is also in httpOnly cookie from backend
+      
+      // Fetch user data
+      const response = await AuthAPI.me();
+      setUser(response.data);
+      
+      return { success: true };
+    } catch (error) {
+      console.error('OAuth callback processing error:', error);
+      localStorage.removeItem('access_token');
+      throw error;
+    }
+  };
+
   const value = {
     user,
     loading,
@@ -120,6 +144,8 @@ export const AuthProvider = ({ children }) => {
     logout,
     forgotPassword,
     resetPassword,
+    googleLogin,
+    handleOAuthCallback,
   };
 
   return (

@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ||  'http://127.0.0.1:5000'; // 'https://link-for-feedback-backend.onrender.com';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ||  'http://172.20.10.7:5000'; // 'https://link-for-feedback-backend.onrender.com';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -8,6 +8,7 @@ const api = axios.create({
     'Content-Type': 'application/json',
   },
   timeout: 10000,
+  withCredentials: true, // Enable sending cookies with requests
 });
 
 api.interceptors.request.use((config) => {
@@ -33,23 +34,20 @@ api.interceptors.response.use(
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       
-      const refreshToken = localStorage.getItem('refresh_token');
-      if (refreshToken) {
-        try {
-          const response = await axios.post(`${API_BASE_URL}/auth/refresh`, {
-            refresh_token: refreshToken,
-          });
-          
-          const { access_token } = response.data;
-          localStorage.setItem('access_token', access_token);
-          
-          originalRequest.headers.Authorization = `Bearer ${access_token}`;
-          return api(originalRequest);
-        } catch (refreshError) {
-          localStorage.removeItem('access_token');
-          localStorage.removeItem('refresh_token');
-          window.location.href = '/login';
-        }
+      try {
+        // Refresh token is sent automatically via httpOnly cookie
+        const response = await axios.post(`${API_BASE_URL}/api/auth/refresh`, {}, {
+          withCredentials: true,
+        });
+        
+        const { access_token } = response.data;
+        localStorage.setItem('access_token', access_token);
+        
+        originalRequest.headers.Authorization = `Bearer ${access_token}`;
+        return api(originalRequest);
+      } catch (refreshError) {
+        localStorage.removeItem('access_token');
+        window.location.href = '/login';
       }
     }
     
@@ -58,13 +56,17 @@ api.interceptors.response.use(
 );
 
 export const AuthAPI = {
-  register: (data) => api.post('/auth/register', data),
-  login: (data) => api.post('/auth/login', data),
-  me: () => api.get('/auth/me'),
-  refresh: (data) => api.post('/auth/refresh', data),
-  logout: (data) => api.post('/auth/logout', data),
-  forgotPassword: (data) => api.post('/auth/forgot-password', data),
-  resetPassword: (data) => api.post('/auth/reset-password', data),
+  register: (data) => api.post('/api/auth/register', data),
+  login: (data) => api.post('/api/auth/login', data),
+  me: () => api.get('/api/auth/me'),
+  refresh: () => api.post('/api/auth/refresh'),
+  logout: () => api.post('/api/auth/logout'),
+  forgotPassword: (data) => api.post('/api/auth/forgot-password', data),
+  resetPassword: (data) => api.post('/api/auth/reset-password', data),
+  googleURL: () => api.get('/api/auth/google'),
+  googleCallback: (code) => api.get(`/api/auth/google/callback?code=${code}`),
+  sendVerificationEmail: () => api.post('/api/auth/send-verification'),
+  verifyEmail: (token) => api.get(`/api/auth/verify-email/${token}`),
 };
 
 export const FeedbackLinksAPI = {

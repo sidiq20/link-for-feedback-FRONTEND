@@ -9,6 +9,9 @@ import LandingPage from './pages/LandingPage';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
+import GoogleCallback from './pages/GoogleCallback';
+import ResetPassword from './pages/ResetPassword';
+import VerifyEmail from './pages/verifyEmail';
 import Dashboard from './pages/Dashboard';
 import Links from './pages/Links';
 import CreateLink from './pages/CreateLink';
@@ -40,6 +43,9 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
+          <Route path="/auth/callback" element={<GoogleCallback />} />
+          <Route path="/verify-email/:token" element={<VerifyEmail />} />
           <Route path="/f/:slug" element={<PublicFeedback />} />
           <Route path="/a/:slug" element={<PublicAnonymous />} />
           
@@ -148,7 +154,9 @@ function App() {
             path="/forms/new"
             element={
               <ProtectedRoute>
-                <CreateForm />
+                <Layout>
+                  <CreateForm />
+                </Layout>
               </ProtectedRoute>
             }
           />
@@ -175,7 +183,9 @@ function App() {
             path="/forms/:formId/view"
             element={
               <ProtectedRoute>
-                <ViewForm />
+                <Layout>
+                  <ViewForm />
+                </Layout>
               </ProtectedRoute>
             }
           />

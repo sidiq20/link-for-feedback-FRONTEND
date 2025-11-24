@@ -11,12 +11,17 @@
   },
   "dependencies": {
     "@headlessui/react": "^2.2.7",
+    "@hookform/resolvers": "^5.2.2",
     "axios": "^1.11.0",
+    "framer-motion": "^12.23.24",
     "lucide-react": "^0.344.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-hook-form": "^7.66.1",
+    "react-hot-toast": "^2.6.0",
     "react-router-dom": "^7.8.1",
-    "recharts": "^3.1.2"
+    "recharts": "^3.1.2",
+    "zod": "^4.1.12"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.1",
