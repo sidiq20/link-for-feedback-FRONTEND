@@ -35,7 +35,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      console.log('Attempting login to:', `${import.meta.env.VITE_API_BASE_URL || 'http://172.20.10.7:5000'}/api/auth/login`);
+      console.log('Attempting login to:', `${import.meta.env.VITE_API_BASE_URL || 'https://link-for-feedback--sidiqolasode5695-bddci582.leapcell.dev'}/api/auth/login`);
       const response = await AuthAPI.login({ email, password });
       console.log('Login response:', response);
       const { access_token, user } = response.data || {};
