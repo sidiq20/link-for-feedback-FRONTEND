@@ -1,6 +1,10 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ||  'https://link-for-feedback--sidiqolasode5695-bddci582.leapcell.dev' ||   'https://link-for-feedback--sidiqolasode5695-bddci582.leapcell.dev';
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL ??
+  'https://link-for-feedback--sidiqolasode5695-bddci582.leapcell.dev';
+
+console.log('API_BASE_URL:', API_BASE_URL);
 
 const api = axios.create({
   baseURL: API_BASE_URL,

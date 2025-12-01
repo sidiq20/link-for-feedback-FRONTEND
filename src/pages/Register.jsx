@@ -16,7 +16,10 @@ const Register = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
 
-  const { register, googleLogin } = useAuth();
+  const { register } = useAuth();
+  const googleLogin = () => {
+    window.location.href = `{API_BASE_URL}/api/auth/google`
+  };
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {

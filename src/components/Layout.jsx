@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { 
@@ -18,7 +18,6 @@ import {
   Edit,
   ListChecks
 } from 'lucide-react';
-import { useState } from 'react';
 
 const Layout = ({ children }) => {
   const { user, logout } = useAuth();
@@ -33,7 +32,7 @@ const Layout = ({ children }) => {
 
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: Home },
-    { name: 'Links', href: '/links', icon: LinkIcon },
+    { name: 'Feedback Links', href: '/links', icon: LinkIcon },
     { name: 'Feedback', href: '/feedback', icon: MessageSquare },
     { name: 'Anonymous Links', href: '/anonymous-links', icon: Shield },
     { name: 'Anonymous Messages', href: '/anonymous-messages', icon: MessageCircle },

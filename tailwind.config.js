@@ -16,6 +16,7 @@ export default {
           'border': '#2E2E2E',
           'accent-pink': '#FF5C8A',
           'accent-yellow': '#FFD93D',
+          'whisper-accent-pink': '#ff4b8f',
         },
         // Override default slate colors with our scheme
         slate: {
