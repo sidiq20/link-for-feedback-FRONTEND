@@ -1,26 +1,27 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { 
-  BarChart3, 
-  Link as LinkIcon, 
-  Home, 
-  MessageSquare,
-  Shield,
-  MessageCircle,
+  Home,
+  BookOpen,
+  ClipboardList,
+  Users,
+  Settings,
   User, 
   LogOut, 
   Menu, 
   X,
-  MessageSquare as MessageSquareIcon,
-  FilePlus,
-  FileText,
-  Edit,
-  ListChecks,
-  GraduationCap
+  GraduationCap,
+  ArrowLeft,
+  PlusCircle,
+  BarChart3,
+  Eye,
+  FileQuestion,
+  Mail,
+  Shield
 } from 'lucide-react';
 
-const Layout = ({ children }) => {
+const ExaminerLayout = ({ children }) => {
   const { user, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
@@ -32,34 +33,32 @@ const Layout = ({ children }) => {
   };
 
   const navigation = [
-    { name: 'Dashboard', href: '/dashboard', icon: Home },
-    { name: 'Feedback Links', href: '/links', icon: LinkIcon },
-    { name: 'Feedbacks', href: '/feedback', icon: MessageSquare },
-    { name: 'Anonymous Links', href: '/anonymous-links', icon: Shield },
-    { name: 'Anonymous Messages', href: '/anonymous-messages', icon: MessageCircle },
-    { name: 'Analytics', href: '/analytics', icon: BarChart3 },
-
-    { name: 'Forms', href: '/forms', icon: FileText },
+    { name: 'Dashboard', href: '/examiner', icon: Home },
+    { name: 'My Exams', href: '/examiner/exams', icon: BookOpen },
+    { name: 'Create Exam', href: '/examiner/exams/new', icon: PlusCircle },
+    { name: 'Grading', href: '/examiner/grading', icon: ClipboardList },
+    { name: 'Analytics', href: '/examiner/analytics', icon: BarChart3 },
+    { name: 'Proctoring', href: '/examiner/proctoring', icon: Eye },
   ];
 
   return (
     <div className="min-h-screen bg-slate-950 relative overflow-hidden flex">
       {/* Arc Background */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl"></div>
-        <div className="absolute top-1/2 -left-32 w-64 h-64 bg-blue-600/20 rounded-full blur-2xl"></div>
-        <div className="absolute -bottom-32 right-1/4 w-96 h-96 bg-blue-400/5 rounded-full blur-3xl"></div>
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-violet-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/2 -left-32 w-64 h-64 bg-violet-600/20 rounded-full blur-2xl"></div>
+        <div className="absolute -bottom-32 right-1/4 w-96 h-96 bg-violet-400/5 rounded-full blur-3xl"></div>
       </div>
 
       {/* Sidebar */}
       <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-slate-900/90 backdrop-blur-xl border-r border-slate-800/50 transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-all duration-300 ease-in-out lg:translate-x-0 lg:relative lg:flex lg:flex-col`}>
         <div className="flex items-center justify-between h-16 px-6 border-b border-slate-800/50">
           <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-whisper-accent-pink rounded-lg flex items-center justify-center">
-              <MessageSquare className="w-4 h-4 text-white" />
+            <div className="w-8 h-8 bg-violet-500 rounded-lg flex items-center justify-center">
+              <Shield className="w-4 h-4 text-white" />
             </div>
-            <h1 className="text-xl font-bold text-whisper-accent-pink font-mono">
-              Whisper
+            <h1 className="text-xl font-bold text-violet-400 font-mono">
+              Examiner
             </h1>
           </div>
           <button
@@ -83,7 +82,7 @@ const Layout = ({ children }) => {
                       onClick={() => setSidebarOpen(false)}
                       className={`flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 group ${
                         isActive
-                          ? 'bg-whisper-accent-pink text-white shadow-lg'
+                          ? 'bg-violet-500 text-white shadow-lg'
                           : 'text-gray-300 hover:text-white hover:bg-slate-800/50'
                       }`}
                     >
@@ -94,31 +93,31 @@ const Layout = ({ children }) => {
                 );
               })}
             </ul>
+
+            {/* Switch Mode */}
+            <div className="mt-8 pt-4 border-t border-slate-800/50 space-y-2">
+              <Link
+                to="/exam"
+                className="flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 text-emerald-400 hover:text-white hover:bg-emerald-500/20"
+              >
+                <GraduationCap className="mr-3 h-5 w-5" />
+                Student Mode
+              </Link>
+              <Link
+                to="/dashboard"
+                className="flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 text-gray-400 hover:text-white hover:bg-slate-800/50"
+              >
+                <ArrowLeft className="mr-3 h-5 w-5" />
+                Back to Whisper
+              </Link>
+            </div>
           </nav>
         </div>
 
         <div className="p-4 border-t border-slate-800/50">
-          {/* Exam Mode Button */}
-          <Link
-            to="/exam"
-            className="flex items-center w-full px-4 py-3 mb-3 bg-gradient-to-r from-emerald-500/20 to-emerald-600/20 border border-emerald-500/30 rounded-xl text-emerald-400 hover:border-emerald-500/50 hover:from-emerald-500/30 hover:to-emerald-600/30 transition-all duration-200"
-          >
-            <GraduationCap className="w-5 h-5 mr-3" />
-            <span className="font-medium">Exam Mode</span>
-          </Link>
-
-          {/* Examiner Mode Button */}
-          <Link
-            to="/examiner"
-            className="flex items-center w-full px-4 py-3 mb-3 bg-gradient-to-r from-violet-500/20 to-violet-600/20 border border-violet-500/30 rounded-xl text-violet-400 hover:border-violet-500/50 hover:from-violet-500/30 hover:to-violet-600/30 transition-all duration-200"
-          >
-            <Shield className="w-5 h-5 mr-3" />
-            <span className="font-medium">Examiner Mode</span>
-          </Link>
-          
           <div className="flex items-center justify-between bg-slate-800/30 rounded-xl p-3 hover:bg-slate-800/50 transition-colors">
             <div className="flex items-center">
-              <div className="w-8 h-8 bg-whisper-accent-pink rounded-full flex items-center justify-center">
+              <div className="w-8 h-8 bg-violet-500 rounded-full flex items-center justify-center">
                 <User className="w-4 h-4 text-white" />
               </div>
               <span className="ml-3 text-sm font-medium text-white truncate max-w-[120px]">
@@ -147,14 +146,14 @@ const Layout = ({ children }) => {
             <Menu className="w-6 h-6" />
           </button>
           <div className="flex items-center space-x-2">
-            <div className="w-6 h-6 bg-whisper-accent-pink rounded-md flex items-center justify-center">
-              <MessageSquare className="w-3 h-3 text-white" />
+            <div className="w-6 h-6 bg-violet-500 rounded-md flex items-center justify-center">
+              <Shield className="w-3 h-3 text-white" />
             </div>
-            <h1 className="text-lg font-semibold text-whisper-accent-pink font-mono">
-              Whisper
+            <h1 className="text-lg font-semibold text-violet-400 font-mono">
+              Examiner
             </h1>
           </div>
-          <div className="w-8 h-8 bg-whisper-accent-pink rounded-full flex items-center justify-center">
+          <div className="w-8 h-8 bg-violet-500 rounded-full flex items-center justify-center">
             <User className="w-4 h-4 text-white" />
           </div>
         </div>
@@ -178,4 +177,4 @@ const Layout = ({ children }) => {
   );
 };
 
-export default Layout;
+export default ExaminerLayout;

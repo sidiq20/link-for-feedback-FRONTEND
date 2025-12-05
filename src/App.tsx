@@ -32,6 +32,27 @@ import ViewForm from './pages/ViewForm';
 import PublicForm from './pages/PublicForm';
 import EditForm from './pages/EditForm';
 
+// Exam Mode (Student)
+import ExamLayout from './layouts/ExamLayout';
+import ExamDashboard from './pages/exam/ExamDashboard';
+import MyExams from './pages/exam/MyExams';
+import ExamResults from './pages/exam/ExamResults';
+import Certificates from './pages/exam/Certificates';
+import TakeExam from './pages/exam/TakeExam';
+import RegisterExam from './pages/exam/RegisterExam';
+
+// Examiner Mode
+import ExaminerLayout from './layouts/ExaminerLayout';
+import ExaminerDashboard from './pages/examiner/ExaminerDashboard';
+import ExamList from './pages/examiner/ExamList';
+import CreateExam from './pages/examiner/CreateExam';
+import ExamDetail from './pages/examiner/ExamDetail';
+import EditExam from './pages/examiner/EditExam';
+import AddQuestion from './pages/examiner/AddQuestion';
+import Grading from './pages/examiner/Grading';
+import Analytics from './pages/examiner/Analytics';
+import Proctoring from './pages/examiner/Proctoring';
+
 
 function App() {
   return (
@@ -199,6 +220,169 @@ function App() {
             element={
               <ProtectedRoute>
                 <Layout><EditForm /></Layout>
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Exam Mode Routes (Student) */}
+          <Route
+            path="/exam"
+            element={
+              <ProtectedRoute>
+                <ExamLayout>
+                  <ExamDashboard />
+                </ExamLayout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/exam/my-exams"
+            element={
+              <ProtectedRoute>
+                <ExamLayout>
+                  <MyExams />
+                </ExamLayout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/exam/results"
+            element={
+              <ProtectedRoute>
+                <ExamLayout>
+                  <ExamResults />
+                </ExamLayout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/exam/certificates"
+            element={
+              <ProtectedRoute>
+                <ExamLayout>
+                  <Certificates />
+                </ExamLayout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/exam/take/:examId"
+            element={
+              <ProtectedRoute>
+                <TakeExam />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/exam/register"
+            element={
+              <ProtectedRoute>
+                <RegisterExam />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Examiner Mode Routes */}
+          <Route
+            path="/examiner"
+            element={
+              <ProtectedRoute>
+                <ExaminerLayout>
+                  <ExaminerDashboard />
+                </ExaminerLayout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/examiner/exams"
+            element={
+              <ProtectedRoute>
+                <ExaminerLayout>
+                  <ExamList />
+                </ExaminerLayout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/examiner/exams/new"
+            element={
+              <ProtectedRoute>
+                <ExaminerLayout>
+                  <CreateExam />
+                </ExaminerLayout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/examiner/exams/:examId/edit"
+            element={
+              <ProtectedRoute>
+                <ExaminerLayout>
+                  <EditExam />
+                </ExaminerLayout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/examiner/exams/:examId/questions/add"
+            element={
+              <ProtectedRoute>
+                <ExaminerLayout>
+                  <AddQuestion />
+                </ExaminerLayout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/examiner/exams/:examId"
+            element={
+              <ProtectedRoute>
+                <ExaminerLayout>
+                  <ExamDetail />
+                </ExaminerLayout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/examiner/grading"
+            element={
+              <ProtectedRoute>
+                <ExaminerLayout>
+                  <Grading />
+                </ExaminerLayout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/examiner/analytics"
+            element={
+              <ProtectedRoute>
+                <ExaminerLayout>
+                  <Analytics />
+                </ExaminerLayout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/examiner/proctoring"
+            element={
+              <ProtectedRoute>
+                <ExaminerLayout>
+                  <Proctoring />
+                </ExaminerLayout>
               </ProtectedRoute>
             }
           />

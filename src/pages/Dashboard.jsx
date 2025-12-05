@@ -21,13 +21,10 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [overviewRes, trendRes] = await Promise.all([
-          AnalyticsAPI.overview(),
-          AnalyticsAPI.trend(30)
-        ]);
-
+        const overviewRes = await AnalyticsAPI.getOverview();
         setOverview(overviewRes.data);
-        setTrend(trendRes.data?.trend || []);
+        // Trend endpoint may not exist, set empty for now
+        setTrend([]);
       } catch (error) {
         console.error('Failed to fetch dashboard data:', error);
         // Set default values on error
