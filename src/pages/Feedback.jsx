@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { FeedbackAPI } from '../services/api';
 import { 
   Search, 
@@ -12,6 +13,9 @@ import {
 } from 'lucide-react';
 
 const Feedback = () => {
+  const [searchParams] = useSearchParams();
+  const linkId = searchParams.get('link');
+  
   const [feedback, setFeedback] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -20,12 +24,21 @@ const Feedback = () => {
 
   useEffect(() => {
     fetchFeedback();
-  }, []);
+  }, [linkId]);
 
   const fetchFeedback = async () => {
     try {
       setError('');
-      const response = await FeedbackAPI.list({ page: 1, per_page: 50 });
+      let response;
+      
+      if (linkId) {
+        // Fetch feedback for specific link
+        response = await FeedbackAPI.list(linkId);
+      } else {
+        // Fetch all user feedback (this endpoint needs to be added to API)
+        response = await FeedbackAPI.list();
+      }
+      
       setFeedback(response.data.feedback || []);
     } catch (error) {
       console.error('Failed to fetch feedback:', error);

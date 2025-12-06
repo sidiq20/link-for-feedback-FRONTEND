@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { AnonymousAPI } from '../services/api';
 import { 
   Search, 
@@ -10,6 +11,9 @@ import {
 } from 'lucide-react';
 
 const AnonymousMessages = () => {
+  const [searchParams] = useSearchParams();
+  const linkId = searchParams.get('link');
+  
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -18,12 +22,21 @@ const AnonymousMessages = () => {
 
   useEffect(() => {
     fetchMessages();
-  }, []);
+  }, [linkId]);
 
   const fetchMessages = async () => {
     try {
       setError('');
-      const response = await AnonymousAPI.list({ page: 1, per_page: 50 });
+      let response;
+      
+      if (linkId) {
+        // Fetch messages for specific link
+        response = await AnonymousAPI.list(linkId);
+      } else {
+        // Fetch all user messages (this endpoint needs to be added to API)
+        response = await AnonymousAPI.list();
+      }
+      
       setMessages(response.data.messages || response.data || []);
     } catch (error) {
       console.error('Failed to fetch messages:', error);
