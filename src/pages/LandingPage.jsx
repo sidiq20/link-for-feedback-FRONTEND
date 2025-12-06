@@ -12,7 +12,9 @@ import {
   Users,
   Zap,
   Lock,
-  TrendingUp
+  TrendingUp,
+  GraduationCap,
+  Eye
 } from 'lucide-react';
 
 const LandingPage = () => {
@@ -58,6 +60,24 @@ const LandingPage = () => {
       title: "Anonymous Messages",
       description: "Enable honest communication with completely anonymous message collection",
       color: "from-pink-500 to-red-500"
+    },
+    {
+      icon: GraduationCap,
+      title: "Exam Management",
+      description: "Create, schedule, and manage secure online examinations with ease",
+      color: "from-emerald-400 to-green-600"
+    },
+    {
+      icon: Eye,
+      title: "Secure Proctoring",
+      description: "AI-powered proctoring system to ensure exam integrity and fairness",
+      color: "from-violet-500 to-purple-600"
+    },
+    {
+      icon: TrendingUp,
+      title: "Smart Grading",
+      description: "Automated grading and detailed performance analytics for students",
+      color: "from-orange-400 to-red-500"
     },
     {
       icon: BarChart3,
@@ -263,7 +283,7 @@ const LandingPage = () => {
           </h1>
           <p className="text-lg lg:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
             Create secure anonymous message channels, collect honest feedback,
-            and build trust through complete privacy protection.
+            conduct secure exams, and build trust through complete privacy protection.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">
             <Link
@@ -303,7 +323,7 @@ const LandingPage = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {features.map((feature, index) => {
               const Icon = feature.icon;
               const isActive = activeFeature === index;

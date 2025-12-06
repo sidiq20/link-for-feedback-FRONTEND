@@ -69,30 +69,29 @@ const ExaminerLayout = ({ children }) => {
           </button>
         </div>
         
-        <div className='flex flex-col h-full'>
-          <nav className="flex-1 mt-6 px-4 overflow-y-auto">
-            <ul className="space-y-2">
-              {navigation.map((item) => {
-                const Icon = item.icon;
-                const isActive = location.pathname === item.href;
-                return (
-                  <li key={item.name}>
-                    <Link
-                      to={item.href}
-                      onClick={() => setSidebarOpen(false)}
-                      className={`flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 group ${
-                        isActive
-                          ? 'bg-violet-500 text-white shadow-lg'
-                          : 'text-gray-300 hover:text-white hover:bg-slate-800/50'
-                      }`}
-                    >
-                      <Icon className={`mr-3 h-5 w-5 transition-transform duration-200 ${isActive ? '' : 'group-hover:scale-110'}`} />
-                      {item.name}
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
+        <nav className="flex-1 mt-6 px-4 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
+          <ul className="space-y-2">
+            {navigation.map((item) => {
+              const Icon = item.icon;
+              const isActive = location.pathname === item.href;
+              return (
+                <li key={item.name}>
+                  <Link
+                    to={item.href}
+                    onClick={() => setSidebarOpen(false)}
+                    className={`flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 group ${
+                      isActive
+                        ? 'bg-violet-500 text-white shadow-lg'
+                        : 'text-gray-300 hover:text-white hover:bg-slate-800/50'
+                    }`}
+                  >
+                    <Icon className={`mr-3 h-5 w-5 transition-transform duration-200 ${isActive ? '' : 'group-hover:scale-110'}`} />
+                    {item.name}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
 
             {/* Switch Mode */}
             <div className="mt-8 pt-4 border-t border-slate-800/50 space-y-2">
@@ -111,8 +110,7 @@ const ExaminerLayout = ({ children }) => {
                 Back to Whisper
               </Link>
             </div>
-          </nav>
-        </div>
+        </nav>
 
         <div className="p-4 border-t border-slate-800/50">
           <div className="flex items-center justify-between bg-slate-800/30 rounded-xl p-3 hover:bg-slate-800/50 transition-colors">
