@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { ExamManageAPI } from '../../services/api';
+import { ExamRegistrationAPI } from '../../services/api';
 import {
   BookOpen,
   Search,
   KeyRound,
   ArrowRight,
   AlertCircle,
-  Info
+  Info,
+  CheckCircle,
+  Loader
 } from 'lucide-react';
 
 const RegisterExam = () => {
@@ -16,7 +18,9 @@ const RegisterExam = () => {
   const navigate = useNavigate();
   const [examCode, setExamCode] = useState('');
   const [loading, setLoading] = useState(false);
+  const [checking, setChecking] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [examInfo, setExamInfo] = useState(null);
 
   const handleSearch = async () => {
@@ -26,27 +30,43 @@ const RegisterExam = () => {
     }
 
     try {
-      setLoading(true);
+      setChecking(true);
       setError('');
-      // Search for exam by code
-      const response = await ExamManageAPI.list();
-      const exam = response.data.exams?.find(e => e.code === examCode.toUpperCase());
+      setSuccess('');
+      setExamInfo(null);
       
-      if (exam) {
-        setExamInfo(exam);
-      } else {
-        setError('Exam not found. Please check the code and try again.');
-      }
+      const response = await ExamRegistrationAPI.checkExam(examCode.toUpperCase());
+      setExamInfo(response.data);
     } catch (err) {
-      setError(err.response?.data?.error || 'Failed to search for exam');
+      setError(err.response?.data?.error || 'Exam not found. Please check the code and try again.');
+      setExamInfo(null);
     } finally {
-      setLoading(false);
+      setChecking(false);
     }
   };
 
-  const handleRegister = () => {
-    if (examInfo) {
-      navigate(`/exam/take/${examInfo._id}`);
+  const handleRegister = async () => {
+    if (!examCode.trim()) {
+      setError('Invalid exam code');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError('');
+      setSuccess('');
+      
+      const response = await ExamRegistrationAPI.register(examCode.toUpperCase());
+      setSuccess('Successfully registered for exam!');
+      
+      // Redirect to exam dashboard after a short delay
+      setTimeout(() => {
+        navigate('/exam');
+      }, 1500);
+    } catch (err) {
+      setError(err.response?.data?.error || 'Failed to register for exam');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -81,11 +101,14 @@ const RegisterExam = () => {
             />
             <button
               onClick={handleSearch}
-              disabled={loading || !examCode.trim()}
+              disabled={checking || !examCode.trim()}
               className="px-6 py-3 bg-violet-500 hover:bg-violet-600 disabled:bg-slate-700 disabled:text-gray-500 text-white rounded-xl font-medium transition-colors flex items-center"
             >
-              {loading ? (
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white" />
+              {checking ? (
+                <>
+                  <Loader className="w-5 h-5 mr-2 animate-spin" />
+                  Checking...
+                </>
               ) : (
                 <>
                   <Search className="w-5 h-5 mr-2" />
@@ -94,6 +117,14 @@ const RegisterExam = () => {
               )}
             </button>
           </div>
+
+
+          {success && (
+            <div className="mt-4 p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl flex items-start">
+              <CheckCircle className="w-5 h-5 text-emerald-400 mr-3 mt-0.5" />
+              <p className="text-emerald-400 text-sm">{success}</p>
+            </div>
+          )}
 
           {error && (
             <div className="mt-4 p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex items-start">
@@ -111,19 +142,15 @@ const RegisterExam = () => {
                 <h2 className="text-2xl font-bold text-white mb-2">{examInfo.title}</h2>
                 <p className="text-gray-400">{examInfo.description || 'No description available'}</p>
               </div>
-              <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                examInfo.status === 'published' 
-                  ? 'bg-emerald-500/20 text-emerald-400'
-                  : 'bg-amber-500/20 text-amber-400'
-              }`}>
-                {examInfo.status}
+              <span className={`px-3 py-1 rounded-full text-xs font-medium bg-emerald-500/20 text-emerald-400`}>
+                Published
               </span>
             </div>
 
             <div className="grid grid-cols-2 gap-4 mb-6">
               <div className="p-4 bg-slate-800/30 rounded-xl">
                 <p className="text-gray-400 text-sm mb-1">Duration</p>
-                <p className="text-white font-semibold">{examInfo.duration_seconds / 60 || 60} minutes</p>
+                <p className="text-white font-semibold">{Math.floor((examInfo.duration_seconds || 3600) / 60)} minutes</p>
               </div>
               <div className="p-4 bg-slate-800/30 rounded-xl">
                 <p className="text-gray-400 text-sm mb-1">Questions</p>
@@ -131,22 +158,32 @@ const RegisterExam = () => {
               </div>
             </div>
 
-            {examInfo.status === 'published' ? (
-              <button
-                onClick={handleRegister}
-                className="w-full py-4 bg-violet-500 hover:bg-violet-600 text-white rounded-xl font-medium transition-colors flex items-center justify-center"
-              >
-                Start Exam
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </button>
-            ) : (
-              <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl flex items-start">
-                <Info className="w-5 h-5 text-amber-400 mr-3 mt-0.5" />
+            {examInfo.registered ? (
+              <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl flex items-start">
+                <CheckCircle className="w-5 h-5 text-emerald-400 mr-3 mt-0.5" />
                 <div>
-                  <p className="text-amber-400 font-medium">Exam Not Available</p>
-                  <p className="text-amber-400/70 text-sm mt-1">This exam is not yet published. Please check back later.</p>
+                  <p className="text-emerald-400 font-medium">Already Registered</p>
+                  <p className="text-emerald-400/70 text-sm mt-1">You're already registered for this exam. Go to your dashboard to take it.</p>
                 </div>
               </div>
+            ) : (
+              <button
+                onClick={handleRegister}
+                disabled={loading}
+                className="w-full py-4 bg-violet-500 hover:bg-violet-600 disabled:bg-slate-700 disabled:text-gray-500 text-white rounded-xl font-medium transition-colors flex items-center justify-center"
+              >
+                {loading ? (
+                  <>
+                    <Loader className="w-5 h-5 mr-2 animate-spin" />
+                    Registering...
+                  </>
+                ) : (
+                  <>
+                    Register for Exam
+                    <ArrowRight className="w-5 h-5 ml-2" />
+                  </>
+                )}
+              </button>
             )}
           </div>
         )}

@@ -41,68 +41,42 @@ const ExamDetail = () => {
     fetchExamDetails();
   }, [examId]);
 
-  const fetchExamDetails = async () => {
+const fetchExamDetails = async () => {
+  try {
+    setLoading(true);
+    console.log('Fetching exam with ID:', examId);
+    
+    // Fetch exam basic info
+    const examResponse = await ExamManageAPI.get(examId);
+    console.log('Exam Response:', examResponse);
+    setExam(examResponse.data);
+    
+    // Fetch questions separately
     try {
-      setLoading(true);
-      console.log('Fetching exam with ID:', examId);
-      
-      // Fetch exam basic info using API service
-      const examResponse = await ExamManageAPI.get(examId);
-      console.log('Exam Response:', examResponse);
-      console.log('Exam Data:', examResponse.data);
-      
-      // Backend returns exam directly, not wrapped in {exam: ...}
-      setExam(examResponse.data);
-      setQuestions(examResponse.data.questions || []);
-      
-      // Fetch examiners list using API service
-      try {
-        const examinersResponse = await ExamInviteAPI.listExaminers(examId);
-        setExaminers(examinersResponse.data.examiners || []);
-        setInvites(examinersResponse.data.pending_invites || []);
-      } catch (err) {
-        // Examiners list may not exist yet, that's okay
-        console.log('No examiners yet');
-        setExaminers([]);
-        setInvites([]);
-      }
-    } catch (error) {
-      console.error('Failed to fetch exam details:', error);
-    } finally {
-      setLoading(false);
+      const questionsResponse = await ExamManageAPI.getQuestions(examId);
+      console.log('Questions Response:', questionsResponse.data);
+      setQuestions(questionsResponse.data || []);
+    } catch (err) {
+      console.log('No questions yet:', err);
+      setQuestions([]);
     }
-  };
-
-  const handlePublish = async () => {
+    
+    // Fetch examiners list
     try {
-      await ExamManageAPI.publish(examId);
-      fetchExamDetails();
-    } catch (error) {
-      console.error('Failed to publish exam:', error);
+      const examinersResponse = await ExamInviteAPI.listExaminers(examId);
+      setExaminers(examinersResponse.data.examiners || []);
+      setInvites(examinersResponse.data.pending_invites || []);
+    } catch (err) {
+      console.log('No examiners yet');
+      setExaminers([]);
+      setInvites([]);
     }
-  };
-
-  const handleDeleteQuestion = async (questionId) => {
-    if (!confirm('Are you sure you want to delete this question?')) return;
-
-    try {
-      await ExamManageAPI.deleteQuestion(examId, questionId);
-      setQuestions(questions.filter(q => q._id !== questionId));
-    } catch (error) {
-      console.error('Failed to delete question:', error);
-    }
-  };
-
-  const handleInviteExaminer = async () => {
-    try {
-      await ExamInviteAPI.inviteExaminers(examId, [inviteEmail]);
-      setShowInviteModal(false);
-      setInviteEmail('');
-      fetchExamDetails();
-    } catch (error) {
-      console.error('Failed to invite examiner:', error);
-    }
-  };
+  } catch (error) {
+    console.error('Failed to fetch exam details:', error);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const copyExamCode = () => {
     navigator.clipboard.writeText(exam?.code || '');

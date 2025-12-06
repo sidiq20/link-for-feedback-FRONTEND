@@ -76,11 +76,24 @@ const AddQuestion = () => {
     }
 
     try {
-      await ExamManageAPI.addQuestions(examId, questions);
+      // Transform questions to match backend schema
+      const transformedQuestions = questions.map(q => ({
+        type: q.type,
+        prompt: q.text,  // Backend expects 'prompt' not 'text'
+        options: q.options,
+        // For MCQ, send the actual option text, not the index
+        answer_key: q.type === 'mcq' ? q.options[q.correct_answer] : q.correct_answer,
+        points: q.points,
+        explanation: q.explanation
+      }));
+
+      console.log('Submitting questions:', transformedQuestions);
+      const response = await ExamManageAPI.addQuestions(examId, transformedQuestions);
+      console.log('Add questions response:', response);
       navigate(`/examiner/exams/${examId}`);
     } catch (error) {
       console.error('Failed to add questions:', error);
-      alert('Failed to add questions');
+      alert('Failed to add questions. Check console for details.');
     }
   };
 
@@ -113,8 +126,8 @@ const AddQuestion = () => {
                 className="w-full px-4 py-3 bg-slate-800/50 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-violet-500"
               >
                 <option value="mcq">Multiple Choice</option>
-                <option value="true_false">True/False</option>
-                <option value="short_answer">Short Answer</option>
+                <option value="boolean">True/False</option>
+                <option value="text">Short Answer</option>
               </select>
             </div>
 
@@ -170,7 +183,7 @@ const AddQuestion = () => {
               </div>
             )}
 
-            {currentQuestion.type === 'true_false' && (
+            {currentQuestion.type === 'boolean' && (
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">Correct Answer</label>
                 <select
@@ -213,7 +226,7 @@ const AddQuestion = () => {
               className="w-full py-3 bg-violet-500 hover:bg-violet-600 text-white rounded-xl font-medium transition-colors flex items-center justify-center"
             >
               <Plus className="w-5 h-5 mr-2" />
-              Add to Exam
+              Add to List
             </button>
           </div>
         </div>
@@ -233,7 +246,7 @@ const AddQuestion = () => {
             )}
           </div>
 
-          {questions.length === 0 ? (
+         {questions.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-gray-400">No questions added yet</p>
             </div>

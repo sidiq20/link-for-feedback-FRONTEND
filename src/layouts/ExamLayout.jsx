@@ -61,7 +61,7 @@ const ExamLayout = ({ children }) => {
           </button>
         </div>
         
-        <div className='flex flex-col h-full'>
+        <div className='flex flex-col flex-1 min-h-0'>
           <nav className="flex-1 mt-6 px-4 overflow-y-auto">
             <ul className="space-y-2">
               {navigation.map((item) => {
@@ -97,25 +97,26 @@ const ExamLayout = ({ children }) => {
               </Link>
             </div>
           </nav>
-        </div>
 
-        <div className="p-4 border-t border-slate-800/50">
-          <div className="flex items-center justify-between bg-slate-800/30 rounded-xl p-3 hover:bg-slate-800/50 transition-colors">
-            <div className="flex items-center">
-              <div className="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center">
-                <User className="w-4 h-4 text-white" />
+          {/* User Profile - Sticky at bottom */}
+          <div className="flex-shrink-0 p-4 border-t border-slate-800/50 bg-slate-900/90">
+            <div className="flex items-center justify-between bg-slate-800/30 rounded-xl p-3 hover:bg-slate-800/50 transition-colors">
+              <div className="flex items-center">
+                <div className="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center">
+                  <User className="w-4 h-4 text-white" />
+                </div>
+                <span className="ml-3 text-sm font-medium text-white truncate max-w-[120px]">
+                  {user?.name}
+                </span>
               </div>
-              <span className="ml-3 text-sm font-medium text-white truncate max-w-[120px]">
-                {user?.name}
-              </span>
+              <button
+                onClick={handleLogout}
+                className="text-gray-400 hover:text-red-400 p-1 rounded-lg hover:bg-red-900/20 transition-colors"
+                title="Logout"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
             </div>
-            <button
-              onClick={handleLogout}
-              className="text-gray-400 hover:text-red-400 p-1 rounded-lg hover:bg-red-900/20 transition-colors"
-              title="Logout"
-            >
-              <LogOut className="w-4 h-4" />
-            </button>
           </div>
         </div>
       </div>

@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ??
-  'http://127.0.0.1:5000';
+  'https://link-for-feedback--sidiqolasode5695-bddci582.leapcell.dev';
 
 console.log('API_BASE_URL:', API_BASE_URL);
 
@@ -159,6 +159,7 @@ export const ExamManageAPI = {
   clone: (examId) => api.post(`/api/exam_manage/${examId}/clone`),
   updateSettings: (examId, settings) => api.put(`/api/exam_manage/${examId}/settings`, { settings }),
   addQuestions: (examId, questions) => api.post(`/api/exam_manage/${examId}/questions`, { questions }),
+  getQuestions: (examId) => api.get(`/api/exam_manage/${examId}/questions`),
   updateQuestion: (examId, questionId, data) => api.put(`/api/exam_manage/${examId}/questions/${questionId}`, data),
   deleteQuestion: (examId, questionId) => api.delete(`/api/exam_manage/${examId}/questions/${questionId}`),
 };
@@ -224,6 +225,15 @@ export const ExamResultAPI = {
 export const ExamPortalAPI = {
   dashboard: () => api.get('/api/exam_portal/dashboard'),
   proctorDashboard: (examId) => api.get(`/api/exam_portal/proctor_dashboard/${examId}`),
+};
+
+// Exam Registration API (for students to register for exams)
+// NOTE: Backend registers at /api/exam/register
+export const ExamRegistrationAPI = {
+  register: (examCode) => api.post('/api/exam/register', { exam_code: examCode }),
+  list: () => api.get('/api/exam/register/list'),
+  unregister: (registrationId) => api.delete(`/api/exam/register/${registrationId}`),
+  checkExam: (examCode) => api.get(`/api/exam/register/check/${examCode}`),
 };
 
 

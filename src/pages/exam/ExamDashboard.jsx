@@ -13,7 +13,8 @@ import {
   Play,
   FileText,
   AlertCircle,
-  CheckCircle2
+  CheckCircle2,
+  KeyRound
 } from 'lucide-react';
 
 const ExamDashboard = () => {
@@ -141,10 +142,10 @@ const ExamDashboard = () => {
               <Calendar className="w-12 h-12 text-gray-600 mx-auto mb-4" />
               <p className="text-gray-400">No upcoming exams scheduled</p>
               <Link
-                to="/exam/browse"
+                to="/exam/register"
                 className="mt-4 inline-block text-emerald-400 hover:text-emerald-300"
               >
-                Browse available exams
+                Register for an exam
               </Link>
             </div>
           ) : (
@@ -232,15 +233,15 @@ const ExamDashboard = () => {
       {/* Quick Actions */}
       <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
         <Link
-          to="/exam/browse"
+          to="/exam/register"
           className="flex items-center p-4 bg-gradient-to-r from-emerald-500/10 to-emerald-600/10 border border-emerald-500/20 rounded-xl hover:border-emerald-500/40 transition-all group"
         >
           <div className="w-10 h-10 bg-emerald-500/20 rounded-lg flex items-center justify-center mr-4">
-            <BookOpen className="w-5 h-5 text-emerald-400" />
+            <KeyRound className="w-5 h-5 text-emerald-400" />
           </div>
           <div>
-            <p className="text-white font-medium">Browse Exams</p>
-            <p className="text-gray-400 text-sm">Find and register for exams</p>
+            <p className="text-white font-medium">Register for Exam</p>
+            <p className="text-gray-400 text-sm">Enter exam code to register</p>
           </div>
           <ChevronRight className="w-5 h-5 text-emerald-400 ml-auto group-hover:translate-x-1 transition-transform" />
         </Link>

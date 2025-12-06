@@ -15,7 +15,7 @@ import {
   Eye
 } from 'lucide-react';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000';
+const API_BASE = import.meta.env.VITE_API_URL || 'https://link-for-feedback--sidiqolasode5695-bddci582.leapcell.dev';
 
 const ExamResults = () => {
   const { user, token } = useAuth();

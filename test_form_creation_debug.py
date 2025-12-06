@@ -5,7 +5,7 @@ Debug script to test form creation and link generation
 import requests
 import json
 
-BASE_URL = "http://127.0.0.1:5000"
+BASE_URL = "https://link-for-feedback--sidiqolasode5695-bddci582.leapcell.dev"
 
 def test_auth_and_form_creation():
     """Test authentication and form creation flow"""
