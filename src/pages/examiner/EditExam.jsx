@@ -43,8 +43,13 @@ const EditExam = () => {
         title: exam.title || '',
         description: exam.description || '',
         duration: Math.floor((exam.duration_seconds || 3600) / 60),
-        start_time: exam.start_time ? new Date(exam.start_time).toISOString().slice(0, 16) : '',
-        end_time: exam.end_time ? new Date(exam.end_time).toISOString().slice(0, 16) : '',
+        // Format dates for datetime-local input (YYYY-MM-DDThh:mm)
+        // We strip the 'Z' so the browser treats the UTC time string as a local numeric value.
+        // e.g. "10:00Z" -> "10:00" local input. 
+        // When saved, the browser sends "10:00". Backend treats it as "10:00" (UTC or local depending on storage).
+        // If we want "10:00Z" to show as "10:00" in input, we just remove Z.
+        start_time: exam.start_time ? exam.start_time.replace('Z', '').slice(0, 16) : '',
+        end_time: exam.end_time ? exam.end_time.replace('Z', '').slice(0, 16) : '',
         code: exam.code || '',
         settings: exam.settings || examData.settings
       });

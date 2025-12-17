@@ -49,9 +49,15 @@ import CreateExam from './pages/examiner/CreateExam';
 import ExamDetail from './pages/examiner/ExamDetail';
 import EditExam from './pages/examiner/EditExam';
 import AddQuestion from './pages/examiner/AddQuestion';
+import EditQuestion from './pages/examiner/EditQuestion';
 import Grading from './pages/examiner/Grading';
 import Analytics from './pages/examiner/Analytics';
 import Proctoring from './pages/examiner/Proctoring';
+import ExaminerStudents from './pages/examiner/ExaminerStudents';
+import ExaminerSettings from './pages/examiner/ExaminerSettings';
+import ExaminerQuestions from './pages/examiner/ExaminerQuestions';
+import Profile from './pages/exam/Profile';
+import Settings from './pages/exam/Settings';
 
 
 function App() {
@@ -287,6 +293,28 @@ function App() {
             }
           />
 
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <ExamLayout>
+                  <Profile />
+                </ExamLayout>
+              </ProtectedRoute>
+            }
+          />
+
+           <Route
+            path="/settings"
+            element={
+              <ProtectedRoute>
+                <ExamLayout>
+                  <Settings />
+                </ExamLayout>
+              </ProtectedRoute>
+            }
+          />
+
           {/* Examiner Mode Routes */}
           <Route
             path="/examiner"
@@ -342,6 +370,17 @@ function App() {
               </ProtectedRoute>
             }
           />
+          
+          <Route
+            path="/examiner/exams/:examId/questions/:questionId/edit"
+            element={
+              <ProtectedRoute>
+                <ExaminerLayout>
+                  <EditQuestion />
+                </ExaminerLayout>
+              </ProtectedRoute>
+            }
+          />
 
           <Route
             path="/examiner/exams/:examId"
@@ -382,6 +421,39 @@ function App() {
               <ProtectedRoute>
                 <ExaminerLayout>
                   <Proctoring />
+                </ExaminerLayout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/examiner/students"
+            element={
+              <ProtectedRoute>
+                <ExaminerLayout>
+                  <ExaminerStudents />
+                </ExaminerLayout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/examiner/questions"
+            element={
+              <ProtectedRoute>
+                <ExaminerLayout>
+                  <ExaminerQuestions />
+                </ExaminerLayout>
+              </ProtectedRoute>
+            }
+          />
+
+           <Route
+            path="/examiner/settings"
+            element={
+              <ProtectedRoute>
+                <ExaminerLayout>
+                  <ExaminerSettings />
                 </ExaminerLayout>
               </ProtectedRoute>
             }

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuthStore } from '../store/authStore';
 import { 
   BarChart3, 
   Link as LinkIcon, 
@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 
 const Layout = ({ children }) => {
-  const { user, logout } = useAuth();
+  const { user, logout } = useAuthStore();
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);

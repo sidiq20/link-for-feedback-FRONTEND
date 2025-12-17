@@ -69,9 +69,27 @@ const Grading = () => {
     try {
       const response = await ExamGradingAPI.getStudentResult(selectedExam, studentId);
       setSelectedSubmission(response.data);
+      // Map backend 'detailed' to frontend structure if needed, or just use detailed
+      const detailed = response.data.detailed || [];
+      // Normalize detailed results for display
+      const normalizedAnswers = detailed.map(d => ({
+        question_id: d.question_id,
+        question_text: d.question_text,
+        student_answer: d.user_answer,
+        correct_answer: d.correct_answer, // Note: might be null depending on backend
+        points: d.possible,
+        score: d.awarded,
+        comment: d.comment || ''
+      }));
+      
+      setSelectedSubmission({
+        ...response.data,
+        answers: normalizedAnswers
+      });
+
       // Initialize grades
       const initialGrades = {};
-      response.data.answers?.forEach(a => {
+      normalizedAnswers.forEach(a => {
         initialGrades[a.question_id] = {
           score: a.score || 0,
           comment: a.comment || ''
@@ -179,7 +197,8 @@ const Grading = () => {
                 <table className="w-full">
                   <thead>
                     <tr className="bg-slate-800/50">
-                      <th className="px-6 py-4 text-left text-sm font-medium text-gray-400">Student</th>
+                      <th className="px-6 py-4 text-left text-sm font-medium text-gray-400">Student ID</th>
+                      <th className="px-6 py-4 text-left text-sm font-medium text-gray-400">Student Name</th>
                       <th className="px-6 py-4 text-left text-sm font-medium text-gray-400">Submitted</th>
                       <th className="px-6 py-4 text-left text-sm font-medium text-gray-400">Score</th>
                       <th className="px-6 py-4 text-left text-sm font-medium text-gray-400">Status</th>
@@ -190,12 +209,17 @@ const Grading = () => {
                     {submissions.map((sub, index) => (
                       <tr key={index} className="hover:bg-slate-800/30 transition-colors">
                         <td className="px-6 py-4">
+                           <span className="font-mono text-violet-400 bg-violet-500/10 px-2 py-1 rounded">
+                             {sub.student_id || 'N/A'}
+                           </span>
+                        </td>
+                        <td className="px-6 py-4">
                           <div className="flex items-center">
-                            <div className="w-8 h-8 bg-violet-500 rounded-full flex items-center justify-center mr-3">
+                            <div className="w-8 h-8 bg-slate-700 rounded-full flex items-center justify-center mr-3">
                               <User className="w-4 h-4 text-white" />
                             </div>
                             <div>
-                              <p className="text-white font-medium">{sub.student_name || sub.student_id}</p>
+                              <p className="text-white font-medium">{sub.student_name || 'Anonymous'}</p>
                               <p className="text-gray-400 text-sm">{sub.student_email}</p>
                             </div>
                           </div>
@@ -208,8 +232,9 @@ const Grading = () => {
                             (sub.final_score || 0) >= 70 ? 'text-emerald-400' :
                             (sub.final_score || 0) >= 50 ? 'text-amber-400' : 'text-red-400'
                           }`}>
-                            {sub.final_score ?? '--'}%
+                            {sub.final_score ?? '--'}
                           </span>
+                          <span className="text-gray-500 text-sm ml-1">/ {sub.possible_score}</span>
                         </td>
                         <td className="px-6 py-4">
                           {sub.graded ? (
@@ -226,7 +251,7 @@ const Grading = () => {
                         </td>
                         <td className="px-6 py-4 text-right">
                           <button
-                            onClick={() => fetchStudentDetails(sub.student_id)}
+                            onClick={() => fetchStudentDetails(sub.student_id || sub.user_id)}
                             className="px-4 py-2 bg-violet-500/20 text-violet-400 rounded-lg hover:bg-violet-500/30 transition-colors text-sm"
                           >
                             Grade
@@ -279,14 +304,21 @@ const Grading = () => {
                     />
                   </div>
                   <p className="text-white mb-2">{answer.question_text}</p>
-                  <div className="bg-slate-800 rounded-lg p-3 mb-3">
-                    <p className="text-gray-400 text-sm mb-1">Student's Answer:</p>
-                    <p className="text-white">{answer.student_answer || 'No answer'}</p>
+                  <div className="bg-slate-800 rounded-lg p-3 mb-3">                    <p className="text-gray-400 text-sm mb-1">Student's Answer:</p>
+                    <p className="text-white whitespace-pre-wrap">
+                      {typeof answer.student_answer === 'object' && answer.student_answer !== null
+                        ? JSON.stringify(answer.student_answer, null, 2)
+                        : (answer.student_answer || 'No answer')}
+                    </p>
                   </div>
                   {answer.correct_answer && (
                     <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-3 mb-3">
                       <p className="text-emerald-400 text-sm mb-1">Correct Answer:</p>
-                      <p className="text-white">{answer.correct_answer}</p>
+                      <p className="text-white whitespace-pre-wrap">
+                        {typeof answer.correct_answer === 'object' && answer.correct_answer !== null
+                            ? JSON.stringify(answer.correct_answer, null, 2)
+                            : answer.correct_answer}
+                      </p>
                     </div>
                   )}
                   <div>

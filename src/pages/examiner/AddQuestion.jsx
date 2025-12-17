@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ExamManageAPI } from '../../services/api';
+import { QUESTION_TYPES, QUESTION_TYPE_LABELS } from '../../constants/examTypes';
 import { ArrowLeft, Plus, Trash2, Save } from 'lucide-react';
 
 const AddQuestion = () => {
@@ -8,10 +9,11 @@ const AddQuestion = () => {
   const navigate = useNavigate();
   const [questions, setQuestions] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState({
-    type: 'mcq',
+    type: QUESTION_TYPES.MCQ,
     text: '',
     options: ['', '', '', ''],
-    correct_answer: 0,
+    correct_answer: 0, // or [] if allow_multiple
+    allow_multiple: false,
     points: 1,
     explanation: ''
   });
@@ -56,10 +58,12 @@ const AddQuestion = () => {
 
     setQuestions([...questions, { ...currentQuestion }]);
     setCurrentQuestion({
-      type: 'mcq',
+
+      type: QUESTION_TYPES.MCQ,
       text: '',
       options: ['', '', '', ''],
       correct_answer: 0,
+      allow_multiple: false,
       points: 1,
       explanation: ''
     });
@@ -77,15 +81,28 @@ const AddQuestion = () => {
 
     try {
       // Transform questions to match backend schema
-      const transformedQuestions = questions.map(q => ({
-        type: q.type,
-        prompt: q.text,  // Backend expects 'prompt' not 'text'
-        options: q.options,
-        // For MCQ, send the actual option text, not the index
-        answer_key: q.type === 'mcq' ? q.options[q.correct_answer] : q.correct_answer,
-        points: q.points,
-        explanation: q.explanation
-      }));
+      const transformedQuestions = questions.map(q => {
+        let answerKey;
+        if (q.type === 'mcq') {
+           if (q.allow_multiple && Array.isArray(q.correct_answer)) {
+               answerKey = q.correct_answer.map(idx => q.options[idx]);
+           } else {
+               answerKey = q.options[q.correct_answer];
+           }
+        } else {
+           answerKey = q.correct_answer;
+        }
+
+        return {
+          type: q.type,
+          prompt: q.text,
+          options: q.options,
+          answer_key: answerKey,
+          allow_partial: q.allow_multiple, // Map allow_multiple to allow_partial for backend
+          points: q.points,
+          explanation: q.explanation
+        };
+      });
 
       console.log('Submitting questions:', transformedQuestions);
       const response = await ExamManageAPI.addQuestions(examId, transformedQuestions);
@@ -125,9 +142,9 @@ const AddQuestion = () => {
                 onChange={(e) => handleQuestionChange('type', e.target.value)}
                 className="w-full px-4 py-3 bg-slate-800/50 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-violet-500"
               >
-                <option value="mcq">Multiple Choice</option>
-                <option value="boolean">True/False</option>
-                <option value="text">Short Answer</option>
+                {Object.entries(QUESTION_TYPE_LABELS).map(([value, label]) => (
+                  <option key={value} value={value}>{label}</option>
+                ))}
               </select>
             </div>
 
@@ -144,15 +161,49 @@ const AddQuestion = () => {
 
             {currentQuestion.type === 'mcq' && (
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Options</label>
+                <div className="flex justify-between items-center mb-2">
+                    <label className="block text-sm font-medium text-gray-300">Options</label>
+                    <label className="flex items-center space-x-2 text-sm text-gray-400 cursor-pointer">
+                        <input
+                            type="checkbox"
+                            checked={currentQuestion.allow_multiple || false}
+                            onChange={(e) => {
+                                const isMultiple = e.target.checked;
+                                setCurrentQuestion(prev => ({
+                                    ...prev,
+                                    allow_multiple: isMultiple,
+                                    correct_answer: isMultiple ? [] : 0
+                                }));
+                            }}
+                            className="rounded border-slate-700 bg-slate-800"
+                        />
+                        <span>Allow Multiple Answers</span>
+                    </label>
+                </div>
                 <div className="space-y-2">
                   {currentQuestion.options.map((option, index) => (
                     <div key={index} className="flex gap-2">
                       <input
-                        type="radio"
+                        type={currentQuestion.allow_multiple ? "checkbox" : "radio"}
                         name="correct"
-                        checked={currentQuestion.correct_answer === index}
-                        onChange={() => handleQuestionChange('correct_answer', index)}
+                        checked={
+                            currentQuestion.allow_multiple 
+                            ? (Array.isArray(currentQuestion.correct_answer) && currentQuestion.correct_answer.includes(index))
+                            : currentQuestion.correct_answer === index
+                        }
+                        onChange={() => {
+                            if (currentQuestion.allow_multiple) {
+                                setCurrentQuestion(prev => {
+                                    const current = Array.isArray(prev.correct_answer) ? prev.correct_answer : [];
+                                    const newAnswers = current.includes(index)
+                                        ? current.filter(i => i !== index)
+                                        : [...current, index];
+                                    return { ...prev, correct_answer: newAnswers };
+                                });
+                            } else {
+                                handleQuestionChange('correct_answer', index);
+                            }
+                        }}
                         className="mt-3"
                       />
                       <input
@@ -191,6 +242,7 @@ const AddQuestion = () => {
                   onChange={(e) => handleQuestionChange('correct_answer', e.target.value)}
                   className="w-full px-4 py-3 bg-slate-800/50 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-violet-500"
                 >
+                  <option value="">Select answer</option>
                   <option value="true">True</option>
                   <option value="false">False</option>
                 </select>

@@ -23,22 +23,24 @@ const Feedback = () => {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    fetchFeedback();
+    if (linkId) {
+      fetchFeedback();
+    } else {
+      setLoading(false);
+      setError('No link ID provided');
+    }
   }, [linkId]);
 
   const fetchFeedback = async () => {
+    if (!linkId) {
+      setError('No link ID provided');
+      setLoading(false);
+      return;
+    }
+
     try {
       setError('');
-      let response;
-      
-      if (linkId) {
-        // Fetch feedback for specific link
-        response = await FeedbackAPI.list(linkId);
-      } else {
-        // Fetch all user feedback (this endpoint needs to be added to API)
-        response = await FeedbackAPI.list();
-      }
-      
+      const response = await FeedbackAPI.list(linkId);
       setFeedback(response.data.feedback || []);
     } catch (error) {
       console.error('Failed to fetch feedback:', error);

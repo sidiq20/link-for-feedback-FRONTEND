@@ -8,6 +8,16 @@ export default {
         'mono': ['JetBrains Mono', 'monospace'],
       },
       colors: {
+        primary: "#F54E86", // Login Primary (Pink)
+        "primary-hover": "#D93D71",
+        "student-primary": "#2b8cee", // Student Dashboard Primary (Blue)
+        "examiner-primary": "#2b8cee", // Examiner Dashboard Primary (Blue)
+        "background-light": "#f6f7f8", 
+        "background-dark": "#111a22",  // Dash Dark
+        "card-dark": "#233648",        // Dash Card
+        "text-secondary": "#92adc9",
+        "surface-dark": "#121212",     // Login Surface
+        "surface-border": "#27272a",   // Login Border
         whisper: {
           'bg-main': '#0F0F0F',
           'bg-card': '#1A1A1A',

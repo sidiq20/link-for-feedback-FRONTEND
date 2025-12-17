@@ -21,22 +21,24 @@ const AnonymousMessages = () => {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    fetchMessages();
+    if (linkId) {
+      fetchMessages();
+    } else {
+      setLoading(false);
+      setError('No link ID provided');
+    }
   }, [linkId]);
 
   const fetchMessages = async () => {
+    if (!linkId) {
+      setError('No link ID provided');
+      setLoading(false);
+      return;
+    }
+
     try {
       setError('');
-      let response;
-      
-      if (linkId) {
-        // Fetch messages for specific link
-        response = await AnonymousAPI.list(linkId);
-      } else {
-        // Fetch all user messages (this endpoint needs to be added to API)
-        response = await AnonymousAPI.list();
-      }
-      
+      const response = await AnonymousAPI.list(linkId);
       setMessages(response.data.messages || response.data || []);
     } catch (error) {
       console.error('Failed to fetch messages:', error);

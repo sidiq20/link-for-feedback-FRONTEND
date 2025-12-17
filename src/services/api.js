@@ -89,8 +89,9 @@ export const AuthAPI = {
 
 export const FeedbackLinksAPI = {
   create: (linkData) => api.post('/api/links', linkData),
-  list: () => api.get('/api/links/'),
+  list: () => api.get('/api/links'),
   get: (linkId) => api.get(`/api/links/${linkId}`),
+  bySlug: (slug) => api.get(`/api/links/by-slug/${slug}`),
   update: (linkId, linkData) => api.put(`/api/links/${linkId}`, linkData),
   delete: (linkId) => api.delete(`/api/links/${linkId}`),
   toggleStatus: (linkId) => api.patch(`/api/links/${linkId}/toggle`),
@@ -112,6 +113,7 @@ export const AnonymousLinksAPI = {
   create: (linkData) => api.post('/api/anonymous-links', linkData),
   list: () => api.get('/api/anonymous-links/'),
   get: (linkId) => api.get(`/api/anonymous-links/${linkId}`),
+  bySlug: (slug) => api.get(`/api/anonymous-links/slug/${slug}`),
   update: (linkId, linkData) => api.put(`/api/anonymous-links/${linkId}`, linkData),
   delete: (linkId) => api.delete(`/api/anonymous-links/${linkId}`),
   toggleStatus: (linkId) => api.patch(`/api/anonymous-links/${linkId}/toggle`),
@@ -119,13 +121,13 @@ export const AnonymousLinksAPI = {
 
 export const AnonymousAPI = {
   list: (linkId) => api.get(`/api/anonymous/link/${linkId}`),
-  submit: (slug, message) => api.post(`/api/anonymous/submit/${slug}`, { message }),
+  submit: (slug, messageData) => api.post(`/api/anonymous/submit/${slug}`, messageData),
   get: (messageId) => api.get(`/api/anonymous/${messageId}`),
   delete: (messageId) => api.delete(`/api/anonymous/${messageId}`),
 };
 
 export const FormsAPI = {
-  create: (formData) => api.post('/api/forms', formData),
+  create: (formData) => api.post('/api/forms/', formData),
   list: () => api.get('/api/forms/'),
   get: (formId) => api.get(`/api/forms/${formId}`),
   update: (formId, formData) => api.put(`/api/forms/${formId}`, formData),
@@ -134,7 +136,8 @@ export const FormsAPI = {
 };
 
 export const FormLinksAPI = {
-  create: (linkData) => api.post('/api/form-links', linkData),
+  create: (formId, linkData) => api.post(`/api/form-links/${formId}`, linkData),
+  bySlug: (slug) => api.get(`/api/form-links/slug/${slug}`),
   list: (formId) => api.get(`/api/form-links/form/${formId}`),
   get: (linkId) => api.get(`/api/form-links/${linkId}`),
   delete: (linkId) => api.delete(`/api/form-links/${linkId}`),
@@ -150,7 +153,7 @@ export const FormResponseAPI = {
 };
 
 // Exam Management API (for examiners)
-// NOTE: Backend registers at /api/exam_manage, NOT /api/exam/manage
+// NOTE: Backend registers at /api/exam_manage (Override in __init__.py)
 export const ExamManageAPI = {
   create: (data) => api.post('/api/exam_manage/create', data),
   list: () => api.get('/api/exam_manage/list'),
@@ -162,6 +165,7 @@ export const ExamManageAPI = {
   updateSettings: (examId, settings) => api.put(`/api/exam_manage/${examId}/settings`, { settings }),
   addQuestions: (examId, questions) => api.post(`/api/exam_manage/${examId}/questions`, { questions }),
   getQuestions: (examId) => api.get(`/api/exam_manage/${examId}/questions`),
+  getQuestion: (examId, questionId) => api.get(`/api/exam_manage/${examId}/questions/${questionId}`),
   updateQuestion: (examId, questionId, data) => api.put(`/api/exam_manage/${examId}/questions/${questionId}`, data),
   deleteQuestion: (examId, questionId) => api.delete(`/api/exam_manage/${examId}/questions/${questionId}`),
 };
@@ -198,10 +202,14 @@ export const ExamProctoringAPI = {
 };
 
 // Exam Invite API
-// NOTE: Backend registers at /api/exam_invite/
+// NOTE: Backend registers at /api/exam_invite
 export const ExamInviteAPI = {
   searchUsers: (email) => api.get(`/api/exam_invite/search?email=${email}`),
   inviteExaminers: (examId, emails) => api.post(`/api/exam_invite/${examId}`, { examiner_emails: emails }),
+  invite: (data) => {
+    // Adapter for ExamDetail usage
+    return api.post(`/api/exam_invite/${data.exam_id}/create`, { email: data.email, role: data.role });
+  },
   createInviteLink: (examId, data) => api.post(`/api/exam_invite/${examId}/create`, data),
   acceptInvite: (token) => api.post(`/api/exam_invite/accept/${token}`),
   revokeInvite: (inviteId) => api.post(`/api/exam_invite/${inviteId}/revoke`),
@@ -213,7 +221,7 @@ export const ExamInviteAPI = {
 };
 
 // Exam Results API
-// NOTE: Backend registers at /api/exam_result/
+// NOTE: Backend registers at /api/exam_result
 export const ExamResultAPI = {
   getAllResults: (examId) => api.get(`/api/exam_result/${examId}/all/`),
   getStudentResults: (studentId) => api.get(`/api/exam_result/student/${studentId}/list`),
@@ -223,7 +231,7 @@ export const ExamResultAPI = {
 };
 
 // Exam Portal API (student dashboard)
-// NOTE: Backend registers at /api/exam_portal/
+// NOTE: Backend registers at /api/exam_portal
 export const ExamPortalAPI = {
   dashboard: () => api.get('/api/exam_portal/dashboard'),
   proctorDashboard: (examId) => api.get(`/api/exam_portal/proctor_dashboard/${examId}`),

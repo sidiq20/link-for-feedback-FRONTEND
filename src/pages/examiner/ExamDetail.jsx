@@ -78,6 +78,34 @@ const fetchExamDetails = async () => {
   }
 };
 
+  /* New Handlers */
+  const handleInviteExaminer = async () => {
+    try {
+      // Use the generic invite wrapper or specific endpoint if aligned
+      await ExamInviteAPI.invite({ exam_id: examId, email: inviteEmail, role: inviteRole });
+      setShowInviteModal(false);
+      setInviteEmail('');
+      // Refresh details to show new pending invite or examiner
+      fetchExamDetails();
+      alert('Invite sent!');
+    } catch (error) {
+      console.error('Invite failed:', error);
+      alert('Failed to send invite.');
+    }
+  };
+
+  const handlePublish = async () => {
+    if (!window.confirm('Are you sure you want to publish this exam? Passwords and settings will be locked.')) return;
+    try {
+      await ExamManageAPI.publish(examId);
+      fetchExamDetails();
+      alert('Exam published successfully!');
+    } catch (error) {
+      console.error('Publish failed:', error);
+      alert('Failed to publish exam.');
+    }
+  };
+
   const copyExamCode = () => {
     navigator.clipboard.writeText(exam?.code || '');
   };
@@ -361,7 +389,6 @@ const fetchExamDetails = async () => {
         </div>
       )}
 
-Team and Settings tabs content continues...
       {activeTab === 'team' && (
         <div className="bg-slate-900/50 border border-slate-800/50 rounded-xl p-6">
           <div className="flex items-center justify-between mb-6">
