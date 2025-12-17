@@ -34,9 +34,9 @@ const Layout = ({ children }) => {
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: Home },
     { name: 'Feedback Links', href: '/links', icon: LinkIcon },
-    { name: 'Feedbacks', href: '/feedback', icon: MessageSquare },
+    // { name: 'Feedbacks', href: '/feedback', icon: MessageSquare },
     { name: 'Anonymous Links', href: '/anonymous-links', icon: Shield },
-    { name: 'Anonymous Messages', href: '/anonymous-messages', icon: MessageCircle },
+    // { name: 'Anonymous Messages', href: '/anonymous-messages', icon: MessageCircle },
     { name: 'Analytics', href: '/analytics', icon: BarChart3 },
 
     { name: 'Forms', href: '/forms', icon: FileText },
